@@ -48,6 +48,41 @@
                     <strong>Cosmogony owns its branch, you own the merge.</strong> The platform works on a dedicated session branch. It commits, pushes, and opens a pull request. You review the PR exactly as you would any team member's contribution. The default branch is protected — no agent can push to it directly, enforced in code, not just in the agent's instructions.
                 </div>
 
+                <pre class="arch-diagram">
+  BUSINESS REQUIREMENT
+  (ticket, doc, or brief)
+           │
+           ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  Cosmogony  ◄──────────────────── your tooling, your model              │
+  │                                                                         │
+  │  Requirements → Design → Planning → Development                         │
+  │       │              │         │            │                           │
+  │    [gate]         [gate]    [gate]        [gate]  ← you approve each    │
+  │                                                                         │
+  │  Agents work in isolated sandboxes inside your infrastructure           │
+  │  Every action audited · feature branch only · never touches main        │
+  └──────────────────────────────────┬──────────────────────────────────────┘
+                                     │
+                          opens pull request
+                                     │
+                                     ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  YOUR EXISTING SOURCE CONTROL                                           │
+  │                                                                         │
+  │  PR review → team approval → merge to main                              │
+  └──────────────────────────────────┬──────────────────────────────────────┘
+                                     │  merge triggers your pipeline
+                                     ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  YOUR EXISTING CI/CD PIPELINE  (unchanged)                              │
+  │                                                                         │
+  │  build  →  test  →  security scan  →  staging deploy  →  prod deploy   │
+  │                                                                         │
+  │  your governance · your approvals · your compliance controls            │
+  └─────────────────────────────────────────────────────────────────────────┘
+</pre>
+
                 <h2>Bring Your Own Model</h2>
 
                 <p>Cosmogony is model-agnostic and runs multiple models within a single workflow. Different stages can use different models optimised for the task — a cheaper, faster model for triage and gate classification; a more capable model for design and planning; a balanced model for development. This gives you control over cost, latency, and sustainability without sacrificing output quality.</p>
