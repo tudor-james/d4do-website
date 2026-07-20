@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cosmogony Security Model — Secure by design. Every agent action executes in isolated, ephemeral containers inside your infrastructure.">
+    <meta name="author" content="AJ James">
+    <title>Secure by Design — Cosmogony</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="../images/d4do-favicon.png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-bracket">&lt;</span>
+                    <span class="logo-text">Cosmogony</span>
+                    <span class="logo-bracket">/&gt;</span>
+                </div>
+                <div class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../index.html#capabilities">Capabilities</a>
+                    <a href="../index.html#why">Why Cosmogony</a>
+                    <a href="../index.html#contact" class="cta-button">Get Early Access</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="content-page">
+        <div class="container">
+            <section style="max-width: 900px; margin: 0 auto;">
+
+                <a href="../index.html#features" class="back-nav">← Back to Cosmogony</a>
+
+                <h1>Secure by Design</h1>
+                <p style="font-size: 18px; color: var(--accent); margin-bottom: 40px;">Every artifact, every tool call, every line of agent-generated code runs inside your infrastructure — with no trust granted by default</p>
+
+                <p>Cosmogony's security model starts from a single principle: agent execution is untrusted code running in your environment. The platform is architected to contain it, audit it, and attribute it — without slowing down your engineers.</p>
+
+                <h2>Execution Happens Entirely in Your Infrastructure</h2>
+
+                <p>No code runs in-client. No build runs on Cosmogony's servers unless you host Cosmogony there. Agent sessions run in ephemeral containers provisioned inside your environment — your cloud account, your VPC, your security perimeter. Your data classification policies, network controls, and DLP tooling apply without exception.</p>
+
+                <h2>Isolated Sandboxes Per Session</h2>
+
+                <p>Each session gets its own ephemeral container provisioned at session start and destroyed at session end. Containers are namespaced to the session — they cannot communicate with each other, cannot access the host filesystem, and have no visibility into other users' sessions or credentials.</p>
+
+                <div class="security-grid">
+                    <div class="security-card">
+                        <h4>Process isolation</h4>
+                        <p>Separate container per session, non-root user. No Docker socket mount. No host filesystem access.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Resource limits</h4>
+                        <p>CPU, memory, PID count, and disk enforced by the platform via cgroups. Runaway builds cannot starve your infrastructure.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Kernel hardening</h4>
+                        <p>seccomp default profile, no CAP_SYS_ADMIN, no ptrace. Containers run with the smallest possible privilege surface.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Secret isolation</h4>
+                        <p>No backend environment variables or database credentials are injected into the sandbox. Secrets never reach the execution environment.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Temporal isolation</h4>
+                        <p>Containers are destroyed on session end, inactivity timeout, or failure. No state persists between sessions.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Inter-container isolation</h4>
+                        <p>Each sandbox runs on its own Docker network. No inter-container communication is possible regardless of configuration.</p>
+                    </div>
+                </div>
+
+                <h2>Containers Live Once — Zero Drift</h2>
+
+                <p>Cosmogony runs on a YOLO (You Only Live Once) container model. There are no long-running, patched-in-place build environments that accumulate drift. Every session starts from a known, versioned, CI-built image. If a container is destroyed — through a session end, a timeout, or a failure — the next session starts from scratch. Your backend infrastructure and client devices are never modified by agent activity.</p>
+
+                <h2>Network Egress Is Deny-by-Default</h2>
+
+                <p>Sandbox containers run on an isolated Docker network with iptables egress rules enforced at container creation. By default, only package registries (npm, pypi, Maven, Gradle) and your project's git remote are reachable. All other outbound traffic is dropped.</p>
+
+                <div class="callout">
+                    <strong>What this means in practice:</strong> an agent that has been prompt-injected to call an arbitrary endpoint hits a hard network block, not just a policy check. The defence is enforced at the kernel level, below the application layer.
+                </div>
+
+                <p>Org admins configure additional allowed endpoints through the platform. No in-repo file and no agent action can extend or override the network policy.</p>
+
+                <h2>Mandatory Tool Registry — No Phantom Tools</h2>
+
+                <p>Agents can only call MCP-registered tools that an org admin has explicitly permitted. The tool registry is deny-by-default: a server or tool that hasn't been registered simply doesn't exist from the agent's perspective.</p>
+
+                <p>This provides structural protection against prompt injection attacks. An attacker cannot trick an agent into calling an arbitrary endpoint, because the agent has no mechanism to reach anything outside the registry. Enforcement runs at four independent layers:</p>
+
+                <ul>
+                    <li><strong>ADK dispatch</strong> — the agent can only call functions registered at session start. Hallucinated tool names are rejected at the framework level.</li>
+                    <li><strong>Proxy server validation</strong> — every tool call validates the server name against the registry. Unknown servers return 403, not 404 (no information leakage about what exists).</li>
+                    <li><strong>Proxy tool validation</strong> — every tool call validates the tool name against the per-server allowlist.</li>
+                    <li><strong>Network isolation</strong> — even if all three layers above were bypassed, the agent container has no outbound network path to any non-registered endpoint.</li>
+                </ul>
+
+                <h2>Per-User Identity for External Integrations</h2>
+
+                <p>When an agent calls Jira or Slack on your behalf, it does so as <em>you</em>, not as a shared service account. OAuth tokens are stored per-user, encrypted at rest via KMS, and automatically refreshed. External systems see requests attributed to the correct user — correct permissions, correct audit trails in those systems. No "Cosmogony Bot" flooding your changelogs.</p>
+
+                <p>If a token is revoked externally or expires without a valid refresh, the integration is marked as needing re-authorisation and the agent surfaces this to you rather than failing silently or falling back to a service account.</p>
+
+                <h2>Agents Work in the Open</h2>
+
+                <p>Every command an agent executes, every file it modifies, every tool it calls is logged with full attribution — session ID, user ID, timestamp, exit code, and network bytes. The audit log is append-only.</p>
+
+                <p>Agents work on feature branches, never directly on your default branch. All changes arrive as pull requests that your team reviews and approves before they land. The platform's guardrail system enforces this in code — <code>git push</code> to main is blocked at the command level, not just in the instructions.</p>
+
+                <h2>Code-Immutable Safety Guardrails</h2>
+
+                <p>The agent's safety constraints are enforced by a pure function that runs below the LLM — not as prompt instructions the model could reason its way around. Before any shell command executes in the sandbox, the guardrail evaluates it against a code-immutable ruleset:</p>
+
+                <ul>
+                    <li>Git sync operations (<code>push</code>, <code>pull</code>, <code>fetch</code>, <code>clone</code>) — version control is platform-managed</li>
+                    <li>History rewrite or force operations — <code>--force</code>, <code>filter-branch</code>, <code>reset --hard</code> against a remote</li>
+                    <li>Destructive filesystem operations outside <code>/workspace</code></li>
+                    <li>Platform credential access — reading <code>GIT_AUTH_TOKEN</code> or equivalent environment variables</li>
+                    <li>Fork bombs and mass permission changes</li>
+                </ul>
+
+                <p>A blocked command returns steer guidance to the agent so it self-corrects. It is never a silent failure or an infinite retry loop.</p>
+
+                <h2>Compliance-Ready Audit Trail</h2>
+
+                <p>The platform's audit model is designed for ISO 27001 and SOX environments. Every agent action, tool call, and file change is stored in an append-only audit log with full attribution. Gate results — the deterministic build and test verdicts that control stage completion — are recorded with their profile version, so you can reconstruct exactly what was run and what passed. Session containers leave no residue: no credentials in environment variables, no persistent state outside the git repository.</p>
+
+                <p>The platform runs in fully air-gapped environments where no external network access is permitted. Package registries can be pointed at internal mirrors; all Cosmogony components run within your perimeter.</p>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>designed4devops</h4>
+                    <p>Decades of DevOps expertise, now in Cosmogony.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="designed4devops.html">Framework</a></li>
+                        <li><a href="book.html">The Book</a></li>
+                        <li><a href="https://ma.designed4devops.com" target="_blank">Assessment</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/adrianjjames/" target="_blank" aria-label="LinkedIn">in</a>
+                        <a href="mailto:info@designed4devops.com" aria-label="Email">✉</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 designed4devops. All rights reserved.</p>
+                <p>Cosmogony - Autonomous AI Software Development Platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

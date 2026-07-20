@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cosmogony — Aligns to Your Policies and Processes. Works inside your existing infrastructure, CI/CD, and tooling.">
+    <meta name="author" content="AJ James">
+    <title>Aligns to Your Policies and Processes — Cosmogony</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="../images/d4do-favicon.png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-bracket">&lt;</span>
+                    <span class="logo-text">Cosmogony</span>
+                    <span class="logo-bracket">/&gt;</span>
+                </div>
+                <div class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../index.html#capabilities">Capabilities</a>
+                    <a href="../index.html#why">Why Cosmogony</a>
+                    <a href="../index.html#contact" class="cta-button">Get Early Access</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="content-page">
+        <div class="container">
+            <section style="max-width: 900px; margin: 0 auto;">
+
+                <a href="../index.html#features" class="back-nav">← Back to Cosmogony</a>
+
+                <h1>Aligns to Your Policies and Processes</h1>
+                <p style="font-size: 18px; color: var(--accent); margin-bottom: 40px;">Cosmogony works inside your existing infrastructure. It doesn't ask you to change your engineering process — it runs inside it.</p>
+
+                <h2>Works With Your Existing Infrastructure</h2>
+
+                <p>You bring the repository, the CI/CD pipeline, the cloud account, and optionally the model. Cosmogony works on the branch you give it and opens a pull request when the work is ready. Your existing pipeline — GitHub Actions, Jenkins, ArgoCD, whatever you run — is untouched and remains the authority for what ships to production.</p>
+
+                <div class="callout">
+                    <strong>Cosmogony owns its branch, you own the merge.</strong> The platform works on a <code>cosmogony/session-&lt;id&gt;</code> branch. It commits, pushes, and opens a pull request. You review the PR exactly as you would any team member's contribution. The default branch is protected — no agent can push to it directly, enforced in code, not just in the agent's instructions.
+                </div>
+
+                <h2>Bring Your Own Model</h2>
+
+                <p>Cosmogony is model-agnostic and runs multiple models within a single workflow. Different stages can use different models optimised for the task — a cheaper, faster model for triage and gate classification; a more capable model for design and planning; a balanced model for development. This gives you control over cost, latency, and sustainability without sacrificing output quality.</p>
+
+                <p>Running multiple models also means no single provider lock-in. If a model improves, degrades, or a better option emerges for a specific task, you can swap it at the stage level without changing the workflow or retraining the system.</p>
+
+                <h2>Enterprise Integrations</h2>
+
+                <p>Cosmogony integrates with the tools your team already uses for requirements and project management.</p>
+
+                <div class="security-grid">
+                    <div class="security-card">
+                        <h4>Atlassian Jira</h4>
+                        <p>Start a session from a Jira ticket. The requirements agent reads the ticket, asks clarifying questions, and produces a specification. As work progresses, the agent updates ticket status and posts progress comments. When the PR opens, the ticket is linked.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Confluence</h4>
+                        <p>Start with business requirements written in Confluence. The agent reads the page, extracts intent, and grounds the specification in your documented context. Completed design documents can be written back to Confluence.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>GitHub</h4>
+                        <p>Issues become sessions. Commits reference the issue. PRs close it on merge. The full lifecycle is traceable from business requirement to deployed code, with no manual linking required.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Slack</h4>
+                        <p>Agents post status updates to configured channels at gate transitions — "Design stage complete, ready for your review" — keeping the team informed without requiring them to monitor the platform UI.</p>
+                    </div>
+                </div>
+
+                <p>All integrations are configured by org admins through the integration registry. Individual users connect their own OAuth accounts, so actions are attributed correctly to the right person in every external system. Admins control which integrations are enabled, which tools are permitted, and what rate limits apply.</p>
+
+                <h2>Customisable to Your Engineering Culture</h2>
+
+                <h3>Per-Stack Build Profiles</h3>
+                <p>Cosmogony ships with platform-defined build profiles for common stacks — Node/Vite, Python/uv, Android/Capacitor, and others. Each profile defines the exact commands used for install, build, lint, typecheck, test, and acceptance verification. Profiles are code-versioned in the platform and can be overridden by org admins for stacks with non-standard conventions. Agents follow the profile's playbook. They don't invent build commands or bypass the canonical toolchain.</p>
+
+                <p>This matters because it closes a common attack surface: a repository whose <code>package.json</code> sets <code>"test": "exit 0"</code> cannot fool the gate. The platform runs its own verified commands, not the repo's scripts.</p>
+
+                <h3>Agent Behaviour Is Steerable</h3>
+                <p>Prompt extensions at org, team, and project level let you encode your architectural decisions, coding standards, and workflow conventions directly into the agent instructions. These are admin-managed and version-controlled in the platform, not in the repository where an agent could accidentally modify them. Common uses include:</p>
+
+                <ul>
+                    <li>Coding standards — frameworks, patterns, and libraries your codebase uses</li>
+                    <li>Architecture decisions — authentication approach, database access patterns, naming conventions</li>
+                    <li>Build conventions — non-standard toolchain commands for your specific project setup</li>
+                    <li>Security policies — what the agent is and is not permitted to do in your environment</li>
+                </ul>
+
+                <h3>SDLC Alignment</h3>
+                <p>The four-stage workflow maps naturally to most delivery frameworks. Gate behaviour — whether approval is required, who can approve, and what constitutes a passing gate — is configurable per project type. Teams that want more autonomy can reduce gate friction; teams with stricter governance can require explicit sign-off at every stage.</p>
+
+                <p>Cosmogony uses your existing CI/CD pipelines and governance. The platform doesn't replace your pipeline — it feeds it. The PR that emerges from a Cosmogony session goes through exactly the same review, approval, and deployment process as any other PR on your team.</p>
+
+                <h2>Works in Fully Air-Gapped Environments</h2>
+
+                <p>All Cosmogony components can run within your perimeter with no external network dependencies. Package registries can be pointed at internal mirrors. Model inference can be directed at on-premises or VPC-hosted endpoints. The platform has no dependency on Cosmogony's own cloud infrastructure once deployed in your environment.</p>
+
+                <p>This makes Cosmogony compatible with environments that prohibit outbound internet access, including defence, financial services, healthcare, and other regulated sectors where data never leaves the controlled perimeter.</p>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>designed4devops</h4>
+                    <p>Decades of DevOps expertise, now in Cosmogony.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="designed4devops.html">Framework</a></li>
+                        <li><a href="book.html">The Book</a></li>
+                        <li><a href="https://ma.designed4devops.com" target="_blank">Assessment</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/adrianjjames/" target="_blank" aria-label="LinkedIn">in</a>
+                        <a href="mailto:info@designed4devops.com" aria-label="Email">✉</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 designed4devops. All rights reserved.</p>
+                <p>Cosmogony - Autonomous AI Software Development Platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
