@@ -751,10 +751,9 @@ body {
 
 /* Deep Dive Cards */
 .deep-dive-card {
-    text-decoration: none;
-    color: inherit;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 }
 
 .deep-dive-card h3 {
