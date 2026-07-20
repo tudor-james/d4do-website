@@ -843,12 +843,24 @@ body {
     margin-bottom: 0;
 }
 
-/* Security controls table */
+/* Security controls grid */
 .security-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     margin: 24px 0;
+}
+
+@media (max-width: 900px) {
+    .security-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .security-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .security-card {
