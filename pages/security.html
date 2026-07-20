@@ -66,6 +66,62 @@
 
                 <h2>The Cosmogony Architecture: Server-Side Sandboxes in Your Infrastructure</h2>
 
+                <pre class="arch-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  YOUR DEVICE  (UI only — no execution)                                      │
+│                                                                             │
+│   ┌──────────────────────┐                                                  │
+│   │  Cosmogony IDE /     │  chat, approve gates, review PRs                 │
+│   │  Browser             │  ── nothing untrusted runs here ──               │
+│   └──────────┬───────────┘                                                  │
+└──────────────│──────────────────────────────────────────────────────────────┘
+               │  HTTPS  (chat messages, SSE stream)
+               ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  YOUR HOSTED INFRASTRUCTURE  (your cloud account / on-premises)             │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  Cosmogony Backend                                                  │   │
+│  │  ├── API server          workflow routing, session management       │   │
+│  │  ├── Agent orchestrator  LLM calls, tool dispatch                  │   │
+│  │  ├── MCP proxy           tool registry · rate limits · audit log   │   │
+│  │  └── Postgres            session state · chat history · audit trail│   │
+│  └──────────────────────────────────┬───────────────────────────────── ┘   │
+│                                     │  internal network only               │
+│            ┌────────────────────────┼─────────────────────┐                │
+│            ▼                        ▼                      ▼                │
+│  ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐        │
+│  │ sandbox-session1 │   │ sandbox-session2 │   │ sandbox-sessionN │        │
+│  │                  │   │                  │   │                  │        │
+│  │  agent runs here │   │  agent runs here │   │  agent runs here │        │
+│  │  ─ ephemeral     │   │  ─ ephemeral     │   │  ─ ephemeral     │        │
+│  │  ─ non-root      │   │  ─ non-root      │   │  ─ non-root      │        │
+│  │  ─ no secrets    │   │  ─ no secrets    │   │  ─ no secrets    │        │
+│  │  ─ egress: DROP  │   │  ─ egress: DROP  │   │  ─ egress: DROP  │        │
+│  │  ─ destroyed     │   │  ─ destroyed     │   │  ─ destroyed     │        │
+│  │    on session end│   │    on session end│   │    on session end│        │
+│  └────────┬─────────┘   └──────────────────┘   └──────────────────┘        │
+│           │  (no inter-sandbox communication)                               │
+│           │                                                                 │
+│  ┌────────▼──────────────────────────────────────────────────────────┐     │
+│  │  Audit Log  (append-only)                                         │     │
+│  │                                                                   │     │
+│  │  session_id · user_id · tool · command · exit_code · timestamp   │     │
+│  │  ──────────────────────────────────────────────────────────────  │     │
+│  │  every tool call · every file write · every gate result           │     │
+│  └───────────────────────────────────────────────────────────────────┘     │
+│                                                                             │
+│                          ▲  your git remote                                 │
+│                          │  agents push to feature branches only            │
+│                          │  platform opens PR · you approve the merge       │
+└──────────────────────────┼──────────────────────────────────────────────────┘
+                           │
+                    ┌──────┴──────┐
+                    │  GitHub /   │
+                    │  your VCS   │
+                    └─────────────┘
+</pre>
+
                 <p>Every agent action in Cosmogony executes inside an ephemeral, isolated container provisioned within <em>your</em> hosted infrastructure — not on your client device, not in your CI pipeline, and not on Cosmogony's servers. The agent never runs where your credentials live.</p>
 
                 <div class="security-grid">

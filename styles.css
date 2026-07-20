@@ -1011,3 +1011,26 @@ body {
         font-size: 20px;
     }
 }
+
+/* ASCII architecture diagram */
+.arch-diagram {
+    background: #050b18;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 28px 24px;
+    margin: 32px 0;
+    font-family: 'Source Code Pro', 'Fira Code', ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #a8c8e8;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+@media (max-width: 768px) {
+    .arch-diagram {
+        font-size: 10px;
+        padding: 16px 12px;
+    }
+}
