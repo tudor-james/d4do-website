@@ -35,106 +35,99 @@
         <div class="container">
             <section style="max-width: 900px; margin: 0 auto;">
 
-                <a href="../index.html#features" class="back-nav">← Back to Cosmogony</a>
+                <a href="../index.html#why" class="back-nav">← Back to Cosmogony</a>
 
                 <h1>Secure by Design</h1>
-                <p style="font-size: 18px; color: var(--accent); margin-bottom: 40px;">Every artifact, every tool call, every line of agent-generated code runs inside your infrastructure — with no trust granted by default</p>
+                <p style="font-size: 18px; color: var(--accent); margin-bottom: 40px;">The fundamental security problem with agentic AI — and how Cosmogony solves it at the architecture level</p>
 
-                <p>Cosmogony's security model starts from a single principle: agent execution is untrusted code running in your environment. The platform is architected to contain it, audit it, and attribute it — without slowing down your engineers.</p>
+                <h2>The Problem Every Other Agentic Tool Has</h2>
 
-                <h2>Execution Happens Entirely in Your Infrastructure</h2>
+                <p>Most AI coding tools — Cursor, Copilot, local Devin variants, IDE-embedded agents — execute agent-generated code on your machine, inside your IDE process, or in a shared cloud environment. That means:</p>
 
-                <p>No code runs in-client. No build runs on Cosmogony's servers unless you host Cosmogony there. Agent sessions run in ephemeral containers provisioned inside your environment — your cloud account, your VPC, your security perimeter. Your data classification policies, network controls, and DLP tooling apply without exception.</p>
-
-                <h2>Isolated Sandboxes Per Session</h2>
-
-                <p>Each session gets its own ephemeral container provisioned at session start and destroyed at session end. Containers are namespaced to the session — they cannot communicate with each other, cannot access the host filesystem, and have no visibility into other users' sessions or credentials.</p>
-
-                <div class="security-grid">
-                    <div class="security-card">
-                        <h4>Process isolation</h4>
-                        <p>Separate container per session, non-root user. No Docker socket mount. No host filesystem access.</p>
+                <div class="security-grid" style="margin-bottom: 32px;">
+                    <div class="security-card" style="border-color: color-mix(in srgb, #ff6e6e 30%, var(--border));">
+                        <h4 style="color: #ff9e9e;">Agent runs on your laptop</h4>
+                        <p>The agent has access to your filesystem, your environment variables, your SSH keys, your AWS credentials, your browser sessions. A prompt injection in a file it reads can exfiltrate everything reachable from your terminal.</p>
                     </div>
-                    <div class="security-card">
-                        <h4>Resource limits</h4>
-                        <p>CPU, memory, PID count, and disk enforced by the platform via cgroups. Runaway builds cannot starve your infrastructure.</p>
+                    <div class="security-card" style="border-color: color-mix(in srgb, #ff6e6e 30%, var(--border));">
+                        <h4 style="color: #ff9e9e;">Agent runs in your CI/CD pipeline</h4>
+                        <p>Better than local, but the agent inherits pipeline secrets, deployment credentials, and production access scopes. A malicious dependency or injected instruction runs with the same trust as your automation.</p>
                     </div>
-                    <div class="security-card">
-                        <h4>Kernel hardening</h4>
-                        <p>seccomp default profile, no CAP_SYS_ADMIN, no ptrace. Containers run with the smallest possible privilege surface.</p>
-                    </div>
-                    <div class="security-card">
-                        <h4>Secret isolation</h4>
-                        <p>No backend environment variables or database credentials are injected into the sandbox. Secrets never reach the execution environment.</p>
-                    </div>
-                    <div class="security-card">
-                        <h4>Temporal isolation</h4>
-                        <p>Containers are destroyed on session end, inactivity timeout, or failure. No state persists between sessions.</p>
-                    </div>
-                    <div class="security-card">
-                        <h4>Inter-container isolation</h4>
-                        <p>Each sandbox runs on its own Docker network. No inter-container communication is possible regardless of configuration.</p>
+                    <div class="security-card" style="border-color: color-mix(in srgb, #ff6e6e 30%, var(--border));">
+                        <h4 style="color: #ff9e9e;">Agent runs on the vendor's cloud</h4>
+                        <p>Your code, your secrets, and your data leave your perimeter. You depend on the vendor's security controls, their network isolation, and their compliance posture — not your own.</p>
                     </div>
                 </div>
 
-                <h2>Containers Live Once — Zero Drift</h2>
+                <div class="callout">
+                    <strong>The root cause:</strong> these tools treat agent-generated code as trusted. Cosmogony treats it as untrusted by default — and enforces that at the infrastructure level, not with instructions the model can reason its way around.
+                </div>
 
-                <p>Cosmogony runs on a YOLO (You Only Live Once) container model. There are no long-running, patched-in-place build environments that accumulate drift. Every session starts from a known, versioned, CI-built image. If a container is destroyed — through a session end, a timeout, or a failure — the next session starts from scratch. Your backend infrastructure and client devices are never modified by agent activity.</p>
+                <h2>The Cosmogony Architecture: Server-Side Sandboxes in Your Infrastructure</h2>
+
+                <p>Every agent action in Cosmogony executes inside an ephemeral, isolated container provisioned within <em>your</em> hosted infrastructure — not on your client device, not in your CI pipeline, and not on Cosmogony's servers. The agent never runs where your credentials live.</p>
+
+                <div class="security-grid">
+                    <div class="security-card">
+                        <h4>Your infrastructure, your perimeter</h4>
+                        <p>Cosmogony deploys into your cloud account or on-premises environment. Your data classification policies, network controls, and DLP tooling apply without exception. Nothing leaves your perimeter.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>One container per session</h4>
+                        <p>Each agent session gets its own isolated container, created fresh at session start and destroyed at session end. Sessions cannot see each other, cannot share state, and cannot access the host.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>No credentials in the sandbox</h4>
+                        <p>Backend secrets, database credentials, and API keys are never injected into the execution container. The agent cannot exfiltrate what it cannot see.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>No client-side execution</h4>
+                        <p>Nothing the agent generates runs on your laptop or workstation. Your local machine is a UI — it never becomes an execution environment for untrusted code.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Containers live once</h4>
+                        <p>No long-running environments that accumulate drift or persist state. Every session starts from a versioned, CI-built image. Worst case is a destroyed container, not a compromised host.</p>
+                    </div>
+                    <div class="security-card">
+                        <h4>Works air-gapped</h4>
+                        <p>All Cosmogony components run within your perimeter with no external network dependencies. Package registries point at internal mirrors. No data transits the public internet.</p>
+                    </div>
+                </div>
 
                 <h2>Network Egress Is Deny-by-Default</h2>
 
-                <p>Sandbox containers run on an isolated Docker network with iptables egress rules enforced at container creation. By default, only package registries (npm, pypi, Maven, Gradle) and your project's git remote are reachable. All other outbound traffic is dropped.</p>
+                <p>Sandbox containers run on an isolated Docker network with iptables egress rules enforced at container creation — below the application layer, not as a policy the agent could override. By default, only package registries (npm, pypi, Maven, Gradle) and your project's git remote are reachable. All other outbound traffic is dropped at the kernel level.</p>
 
                 <div class="callout">
-                    <strong>What this means in practice:</strong> an agent that has been prompt-injected to call an arbitrary endpoint hits a hard network block, not just a policy check. The defence is enforced at the kernel level, below the application layer.
+                    <strong>Why this matters for prompt injection:</strong> if an attacker embeds instructions in a file the agent reads — telling it to exfiltrate data to an external endpoint — the network DROP means that call never leaves the container, regardless of what the agent tries to do. The defence is architectural, not behavioural.
                 </div>
 
                 <p>Org admins configure additional allowed endpoints through the platform. No in-repo file and no agent action can extend or override the network policy.</p>
 
                 <h2>Mandatory Tool Registry — No Phantom Tools</h2>
 
-                <p>Agents can only call MCP-registered tools that an org admin has explicitly permitted. The tool registry is deny-by-default: a server or tool that hasn't been registered simply doesn't exist from the agent's perspective.</p>
-
-                <p>This provides structural protection against prompt injection attacks. An attacker cannot trick an agent into calling an arbitrary endpoint, because the agent has no mechanism to reach anything outside the registry. Enforcement runs at four independent layers:</p>
+                <p>Agents can only call tools that an org admin has explicitly registered. The registry is deny-by-default: an unregistered server or tool doesn't exist from the agent's perspective. Enforcement runs at four independent layers so that bypassing one doesn't compromise the system:</p>
 
                 <ul>
-                    <li><strong>ADK dispatch</strong> — the agent can only call functions registered at session start. Hallucinated tool names are rejected at the framework level.</li>
-                    <li><strong>Proxy server validation</strong> — every tool call validates the server name against the registry. Unknown servers return 403, not 404 (no information leakage about what exists).</li>
-                    <li><strong>Proxy tool validation</strong> — every tool call validates the tool name against the per-server allowlist.</li>
-                    <li><strong>Network isolation</strong> — even if all three layers above were bypassed, the agent container has no outbound network path to any non-registered endpoint.</li>
+                    <li><strong>Framework dispatch</strong> — the agent can only call functions registered at session start. Hallucinated tool names fail immediately.</li>
+                    <li><strong>Proxy server validation</strong> — every call validates the server against the registry. Unknown servers return 403, not 404, so the registry contents are never leaked.</li>
+                    <li><strong>Proxy tool validation</strong> — every call validates the specific tool against the per-server allowlist.</li>
+                    <li><strong>Network isolation</strong> — even if all three layers above were bypassed, the sandbox has no outbound network path to any non-registered endpoint.</li>
                 </ul>
-
-                <h2>Per-User Identity for External Integrations</h2>
-
-                <p>When an agent calls Jira or Slack on your behalf, it does so as <em>you</em>, not as a shared service account. OAuth tokens are stored per-user, encrypted at rest via KMS, and automatically refreshed. External systems see requests attributed to the correct user — correct permissions, correct audit trails in those systems. No "Cosmogony Bot" flooding your changelogs.</p>
-
-                <p>If a token is revoked externally or expires without a valid refresh, the integration is marked as needing re-authorisation and the agent surfaces this to you rather than failing silently or falling back to a service account.</p>
-
-                <h2>Agents Work in the Open</h2>
-
-                <p>Every command an agent executes, every file it modifies, every tool it calls is logged with full attribution — session ID, user ID, timestamp, exit code, and network bytes. The audit log is append-only.</p>
-
-                <p>Agents work on feature branches, never directly on your default branch. All changes arrive as pull requests that your team reviews and approves before they land. The platform's guardrail system enforces this in code — <code>git push</code> to main is blocked at the command level, not just in the instructions.</p>
 
                 <h2>Code-Immutable Safety Guardrails</h2>
 
-                <p>The agent's safety constraints are enforced by a pure function that runs below the LLM — not as prompt instructions the model could reason its way around. Before any shell command executes in the sandbox, the guardrail evaluates it against a code-immutable ruleset:</p>
+                <p>Safety constraints are enforced by a pure function that runs below the LLM — not as prompt instructions the model could ignore under pressure. Before any shell command executes in the sandbox, it is evaluated against a code-immutable ruleset. Commands that would push to your default branch, rewrite git history, access credential environment variables, or destroy the workspace are blocked and return corrective guidance to the agent. They never execute silently.</p>
 
-                <ul>
-                    <li>Git sync operations (<code>push</code>, <code>pull</code>, <code>fetch</code>, <code>clone</code>) — version control is platform-managed</li>
-                    <li>History rewrite or force operations — <code>--force</code>, <code>filter-branch</code>, <code>reset --hard</code> against a remote</li>
-                    <li>Destructive filesystem operations outside <code>/workspace</code></li>
-                    <li>Platform credential access — reading <code>GIT_AUTH_TOKEN</code> or equivalent environment variables</li>
-                    <li>Fork bombs and mass permission changes</li>
-                </ul>
+                <p>Agents work on feature branches only. Version control is platform-managed — the platform opens the PR, you approve the merge. No agent can push directly to your main branch.</p>
 
-                <p>A blocked command returns steer guidance to the agent so it self-corrects. It is never a silent failure or an infinite retry loop.</p>
+                <h2>Per-User Identity for External Integrations</h2>
 
-                <h2>Compliance-Ready Audit Trail</h2>
+                <p>When an agent calls Jira or Slack on your behalf, it does so as <em>you</em> — not as a shared service account. OAuth tokens are per-user, encrypted at rest, and automatically refreshed. External systems see actions attributed to the correct person with correct permissions. No shared bot credentials with over-provisioned access.</p>
 
-                <p>The platform's audit model is designed for ISO 27001 and SOX environments. Every agent action, tool call, and file change is stored in an append-only audit log with full attribution. Gate results — the deterministic build and test verdicts that control stage completion — are recorded with their profile version, so you can reconstruct exactly what was run and what passed. Session containers leave no residue: no credentials in environment variables, no persistent state outside the git repository.</p>
+                <h2>Full Audit Trail</h2>
 
-                <p>The platform runs in fully air-gapped environments where no external network access is permitted. Package registries can be pointed at internal mirrors; all Cosmogony components run within your perimeter.</p>
+                <p>Every command executed, every file modified, every tool called is logged with full attribution — session ID, user ID, timestamp, exit code, and network bytes. The audit log is append-only. Gate results recording exactly what was built and what passed are stored with their profile version. The platform is designed for ISO 27001 and SOX environments from day one.</p>
 
             </section>
         </div>
