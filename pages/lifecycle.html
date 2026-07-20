@@ -69,7 +69,7 @@
                     </div>
                 </div>
 
-                <p>Every stage produces a durable document committed to the repository — <code>requirements.md</code>, <code>design.md</code>, <code>plan.md</code> — so the work survives any infrastructure restart and is fully auditable.</p>
+                <p>Every stage produces a durable document committed to the repository so the work survives any infrastructure restart and is fully auditable.</p>
 
                 <h2>Human Gates Are Non-Negotiable</h2>
 
@@ -95,9 +95,9 @@
 
                 <h2>Context Comes From Files, Not History</h2>
 
-                <p>Each agent turn starts from an empty session. Context is injected from predecessor documents on disk — the design agent reads <code>requirements.md</code>, the planning agent reads <code>design.md</code> and <code>requirements.md</code>, and so on. This eliminates the most common agentic failure mode: accumulated context from prior stages polluting the current agent's reasoning.</p>
+                <p>Each agent turn starts from a clean context. Each stage is grounded by reading the outputs produced by previous stages — the design agent reads the requirements document, the planning agent reads the design, and so on. This eliminates the most common agentic failure mode: accumulated context from prior stages polluting the current agent's reasoning.</p>
 
-                <p>Git is the persistence boundary. The sandbox is ephemeral; anything that must survive a turn is committed and pushed. Your repository is the source of truth, not an in-memory state machine.</p>
+                <p>The repository is the persistence boundary. The sandbox is ephemeral; anything that must survive a turn is committed. Your repository is the source of truth, not an in-memory state machine.</p>
 
                 <h2>Teams Work Together in Shared Sessions</h2>
 

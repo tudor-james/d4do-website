@@ -42,12 +42,12 @@
 
                 <h2>The Problem Every Other Agentic Tool Has</h2>
 
-                <p>Most AI coding tools — Cursor, Copilot, local Devin variants, IDE-embedded agents — execute agent-generated code on your machine, inside your IDE process, or in a shared cloud environment. That means:</p>
+                <p>Most AI coding tools execute agent-generated code on your machine, inside your IDE process, or in a shared cloud environment. That means:</p>
 
                 <div class="security-grid" style="margin-bottom: 32px;">
                     <div class="security-card" style="border-color: color-mix(in srgb, #ff6e6e 30%, var(--border));">
                         <h4 style="color: #ff9e9e;">Agent runs on your laptop</h4>
-                        <p>The agent has access to your filesystem, your environment variables, your SSH keys, your AWS credentials, your browser sessions. A prompt injection in a file it reads can exfiltrate everything reachable from your terminal.</p>
+                        <p>The agent has access to your filesystem, your environment variables, your keys, your cloud credentials, your browser sessions. A prompt injection in a file it reads can exfiltrate everything reachable from your terminal.</p>
                     </div>
                     <div class="security-card" style="border-color: color-mix(in srgb, #ff6e6e 30%, var(--border));">
                         <h4 style="color: #ff9e9e;">Agent runs in your CI/CD pipeline</h4>
@@ -74,17 +74,17 @@
 │   │  Browser             │  ── nothing untrusted runs here ──              │
 │   └──────────┬───────────┘                                                 │
 └──────────────│─────────────────────────────────────────────────────────────┘
-               │  HTTPS  (chat messages, SSE stream)
+               │  HTTPS  (chat messages, streamed responses)
                ▼
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  YOUR HOSTED INFRASTRUCTURE  (your cloud account / on-premises)            │
 │                                                                            │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │  Cosmogony Backend                                                  │   │
+│  │  Cosmogony Platform                                                 │   │
 │  │  ├── API server          workflow routing, session management       │   │
-│  │  ├── Agent orchestrator  LLM calls, tool dispatch                   │   │
-│  │  ├── MCP proxy           tool registry · rate limits · audit log    │   │
-│  │  └── Postgres            session state · chat history · audit trail │   │
+│  │  ├── Agent runtime       LLM calls, tool dispatch                   │   │
+│  │  ├── Tool gateway        registry · rate limits · audit log         │   │
+│  │  └── Session store       session state · chat history · audit trail │   │
 │  └──────────────────────────────────┬───────────────────────────────── ┘   │
 │                                     │  internal network only               │
 │            ┌────────────────────────┼─────────────────────┐                │
@@ -116,7 +116,6 @@
 └──────────────────────────┼─────────────────────────────────────────────────┘
                            │
                     ┌──────┴──────┐
-                    │  GitHub /   │
                     │  your VCS   │
                     └─────────────┘
 </pre>
@@ -152,7 +151,7 @@
 
                 <h2>Network Egress Is Deny-by-Default</h2>
 
-                <p>Sandbox containers run on an isolated Docker network with iptables egress rules enforced at container creation — below the application layer, not as a policy the agent could override. By default, only package registries (npm, pypi, Maven, Gradle) and your project's git remote are reachable. All other outbound traffic is dropped at the kernel level.</p>
+                <p>Sandbox containers run on an isolated network with egress rules enforced at container creation — below the application layer, not as a policy the agent could override. By default, only approved package registries and your project's source repository are reachable. All other outbound traffic is dropped at the network level.</p>
 
                 <div class="callout">
                     <strong>Why this matters for prompt injection:</strong> if an attacker embeds instructions in a file the agent reads — telling it to exfiltrate data to an external endpoint — the network DROP means that call never leaves the container, regardless of what the agent tries to do. The defence is architectural, not behavioural.
@@ -162,13 +161,13 @@
 
                 <h2>Mandatory Tool Registry — No Phantom Tools</h2>
 
-                <p>Agents can only call tools that an org admin has explicitly registered. The registry is deny-by-default: an unregistered server or tool doesn't exist from the agent's perspective. Enforcement runs at four independent layers so that bypassing one doesn't compromise the system:</p>
+                <p>Agents can only call tools that an org admin has explicitly registered. The registry is deny-by-default: an unregistered tool simply doesn't exist from the agent's perspective. Enforcement runs at multiple independent layers so that bypassing one doesn't compromise the system:</p>
 
                 <ul>
-                    <li><strong>Framework dispatch</strong> — the agent can only call functions registered at session start. Hallucinated tool names fail immediately.</li>
-                    <li><strong>Proxy server validation</strong> — every call validates the server against the registry. Unknown servers return 403, not 404, so the registry contents are never leaked.</li>
-                    <li><strong>Proxy tool validation</strong> — every call validates the specific tool against the per-server allowlist.</li>
-                    <li><strong>Network isolation</strong> — even if all three layers above were bypassed, the sandbox has no outbound network path to any non-registered endpoint.</li>
+                    <li><strong>Runtime dispatch</strong> — the agent can only call tools registered at session start. Hallucinated tool names fail immediately.</li>
+                    <li><strong>Gateway validation</strong> — every call is validated against the registry before it executes. Unknown tools are rejected without leaking information about what exists.</li>
+                    <li><strong>Tool allowlisting</strong> — org admins control which tools are available per integration, scoped to what the team actually needs.</li>
+                    <li><strong>Network isolation</strong> — even if all other layers were bypassed, the sandbox has no outbound network path to any non-registered endpoint.</li>
                 </ul>
 
                 <h2>Code-Immutable Safety Guardrails</h2>
@@ -179,7 +178,7 @@
 
                 <h2>Per-User Identity for External Integrations</h2>
 
-                <p>When an agent calls Jira or Slack on your behalf, it does so as <em>you</em> — not as a shared service account. OAuth tokens are per-user, encrypted at rest, and automatically refreshed. External systems see actions attributed to the correct person with correct permissions. No shared bot credentials with over-provisioned access.</p>
+                <p>When an agent acts on your behalf in an external system, it does so as <em>you</em> — not as a shared service account. Credentials are per-user, encrypted at rest, and automatically refreshed. External systems see actions attributed to the correct person with correct permissions. No shared bot credentials with over-provisioned access.</p>
 
                 <h2>Full Audit Trail</h2>
 

@@ -42,10 +42,10 @@
 
                 <h2>Works With Your Existing Infrastructure</h2>
 
-                <p>You bring the repository, the CI/CD pipeline, the cloud account, and optionally the model. Cosmogony works on the branch you give it and opens a pull request when the work is ready. Your existing pipeline — GitHub Actions, Jenkins, ArgoCD, whatever you run — is untouched and remains the authority for what ships to production.</p>
+                <p>You bring the repository, the CI/CD pipeline, the cloud account, and optionally the model. Cosmogony works on the branch you give it and opens a pull request when the work is ready. Your existing pipeline — whatever you run — is untouched and remains the authority for what ships to production.</p>
 
                 <div class="callout">
-                    <strong>Cosmogony owns its branch, you own the merge.</strong> The platform works on a <code>cosmogony/session-&lt;id&gt;</code> branch. It commits, pushes, and opens a pull request. You review the PR exactly as you would any team member's contribution. The default branch is protected — no agent can push to it directly, enforced in code, not just in the agent's instructions.
+                    <strong>Cosmogony owns its branch, you own the merge.</strong> The platform works on a dedicated session branch. It commits, pushes, and opens a pull request. You review the PR exactly as you would any team member's contribution. The default branch is protected — no agent can push to it directly, enforced in code, not just in the agent's instructions.
                 </div>
 
                 <h2>Bring Your Own Model</h2>
@@ -60,20 +60,20 @@
 
                 <div class="security-grid">
                     <div class="security-card">
-                        <h4>Atlassian Jira</h4>
-                        <p>Start a session from a Jira ticket. The requirements agent reads the ticket, asks clarifying questions, and produces a specification. As work progresses, the agent updates ticket status and posts progress comments. When the PR opens, the ticket is linked.</p>
+                        <h4>Issue Trackers</h4>
+                        <p>Start a session directly from a ticket. The requirements agent reads the ticket, asks clarifying questions, and produces a specification. As work progresses, the agent updates status and posts progress comments. When the PR opens, the ticket is linked.</p>
                     </div>
                     <div class="security-card">
-                        <h4>Confluence</h4>
-                        <p>Start with business requirements written in Confluence. The agent reads the page, extracts intent, and grounds the specification in your documented context. Completed design documents can be written back to Confluence.</p>
+                        <h4>Documentation Platforms</h4>
+                        <p>Start with business requirements written in your documentation system. The agent reads the page, extracts intent, and grounds the specification in your documented context. Completed design documents can be written back.</p>
                     </div>
                     <div class="security-card">
-                        <h4>GitHub</h4>
+                        <h4>Source Control</h4>
                         <p>Issues become sessions. Commits reference the issue. PRs close it on merge. The full lifecycle is traceable from business requirement to deployed code, with no manual linking required.</p>
                     </div>
                     <div class="security-card">
-                        <h4>Slack</h4>
-                        <p>Agents post status updates to configured channels at gate transitions — "Design stage complete, ready for your review" — keeping the team informed without requiring them to monitor the platform UI.</p>
+                        <h4>Team Messaging</h4>
+                        <p>Agents post status updates to configured channels at gate transitions — keeping the team informed without requiring them to monitor the platform UI.</p>
                     </div>
                 </div>
 
@@ -82,9 +82,9 @@
                 <h2>Customisable to Your Engineering Culture</h2>
 
                 <h3>Per-Stack Build Profiles</h3>
-                <p>Cosmogony ships with platform-defined build profiles for common stacks — Node/Vite, Python/uv, Android/Capacitor, and others. Each profile defines the exact commands used for install, build, lint, typecheck, test, and acceptance verification. Profiles are code-versioned in the platform and can be overridden by org admins for stacks with non-standard conventions. Agents follow the profile's playbook. They don't invent build commands or bypass the canonical toolchain.</p>
+                <p>Cosmogony ships with platform-defined build profiles for common technology stacks. Each profile defines the exact commands used for install, build, lint, typecheck, test, and acceptance verification. Profiles are versioned in the platform and can be overridden by org admins for stacks with non-standard conventions. Agents follow the profile's playbook — they don't invent build commands or bypass the canonical toolchain.</p>
 
-                <p>This matters because it closes a common attack surface: a repository whose <code>package.json</code> sets <code>"test": "exit 0"</code> cannot fool the gate. The platform runs its own verified commands, not the repo's scripts.</p>
+                <p>This matters because it closes a common attack surface: a repository that redefines what "test" means cannot fool the gate. The platform runs its own verified commands, not the repo's scripts.</p>
 
                 <h3>Agent Behaviour Is Steerable</h3>
                 <p>Prompt extensions at org, team, and project level let you encode your architectural decisions, coding standards, and workflow conventions directly into the agent instructions. These are admin-managed and version-controlled in the platform, not in the repository where an agent could accidentally modify them. Common uses include:</p>
