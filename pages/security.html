@@ -65,7 +65,8 @@
 
                 <h2>The Cosmogony Architecture: Server-Side Sandboxes in Your Infrastructure</h2>
 
-                <pre class="arch-diagram">
+                <div style="overflow-x: auto; max-width: 100%; margin: 32px 0;">
+                <pre class="arch-diagram" style="margin: 0;">
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  YOUR DEVICE  (UI only — no execution)                                     │
 │                                                                            │
@@ -119,6 +120,7 @@
                     │  your VCS   │
                     └─────────────┘
 </pre>
+                </div>
 
                 <p>Every agent action in Cosmogony executes inside an ephemeral, isolated container provisioned within <em>your</em> hosted infrastructure — not on your client device, not in your CI pipeline, and not on Cosmogony's servers. The agent never runs where your credentials live.</p>
 

@@ -1036,8 +1036,13 @@ body {
     font-size: 12px;
     line-height: 1.5;
     color: #a8c8e8;
+    /* Ensure horizontal scroll works even under overflow-x: hidden on body */
     overflow-x: auto;
+    overflow-y: visible;
     white-space: pre;
+    /* Establish own scroll context so body's overflow-x: hidden doesn't clip */
+    display: block;
+    max-width: 100%;
 }
 
 @media (max-width: 768px) {
