@@ -65,62 +65,8 @@
 
                 <h2>The Cosmogony Architecture: Server-Side Sandboxes in Your Infrastructure</h2>
 
-                <div style="overflow-x: auto; max-width: 100%; margin: 32px 0;">
-                <pre class="arch-diagram" style="margin: 0;">
-┌────────────────────────────────────────────────────────────────────────────┐
-│  YOUR DEVICE  (UI only — no execution)                                     │
-│                                                                            │
-│   ┌──────────────────────┐                                                 │
-│   │  Cosmogony IDE /     │  chat, approve gates, review PRs                │
-│   │  Browser             │  ── nothing untrusted runs here ──              │
-│   └──────────┬───────────┘                                                 │
-└──────────────│─────────────────────────────────────────────────────────────┘
-               │  HTTPS  (chat messages, streamed responses)
-               ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│  YOUR HOSTED INFRASTRUCTURE  (your cloud account / on-premises)            │
-│                                                                            │
-│  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │  Cosmogony Platform                                                 │   │
-│  │  ├── API server          workflow routing, session management       │   │
-│  │  ├── Agent runtime       LLM calls, tool dispatch                   │   │
-│  │  ├── Tool gateway        registry · rate limits · audit log         │   │
-│  │  └── Session store       session state · chat history · audit trail │   │
-│  └──────────────────────────────────┬───────────────────────────────── ┘   │
-│                                     │  internal network only               │
-│            ┌────────────────────────┼─────────────────────┐                │
-│            ▼                        ▼                     ▼                │
-│  ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐        │
-│  │ sandbox-session1 │   │ sandbox-session2 │   │ sandbox-sessionN │        │
-│  │                  │   │                  │   │                  │        │
-│  │  agent runs here │   │  agent runs here │   │  agent runs here │        │
-│  │  ─ ephemeral     │   │  ─ ephemeral     │   │  ─ ephemeral     │        │
-│  │  ─ non-root      │   │  ─ non-root      │   │  ─ non-root      │        │
-│  │  ─ no secrets    │   │  ─ no secrets    │   │  ─ no secrets    │        │
-│  │  ─ egress: DROP  │   │  ─ egress: DROP  │   │  ─ egress: DROP  │        │
-│  │  ─ destroyed     │   │  ─ destroyed     │   │  ─ destroyed     │        │
-│  │    on session end│   │    on session end│   │    on session end│        │
-│  └────────┬─────────┘   └──────────────────┘   └──────────────────┘        │
-│           │  (no inter-sandbox communication)                              │
-│           │                                                                │
-│  ┌────────▼──────────────────────────────────────────────────────────┐     │
-│  │  Audit Log  (append-only)                                         │     │
-│  │                                                                   │     │
-│  │  session_id · user_id · tool · command · exit_code · timestamp    │     │
-│  │  ──────────────────────────────────────────────────────────────   │     │
-│  │  every tool call · every file write · every gate result           │     │
-│  └───────────────────────────────────────────────────────────────────┘     │
-│                                                                            │
-│                          ▲  your git remote                                │
-│                          │  agents push to feature branches only           │
-│                          │  platform opens PR · you approve the merge      │
-└──────────────────────────┼─────────────────────────────────────────────────┘
-                           │
-                    ┌──────┴──────┐
-                    │  your VCS   │
-                    └─────────────┘
-</pre>
-                </div>
+                <div id="cosmogony-arch-diagram" style="margin: 32px 0; border-radius: 14px; overflow: hidden;"></div>
+                <p style="font-size: 12px; color: var(--muted); text-align: center; margin-top: -20px; margin-bottom: 32px;">Hover any component for details</p>
 
                 <p>Every agent action in Cosmogony executes inside an ephemeral, isolated container provisioned within <em>your</em> hosted infrastructure — not on your client device, not in your CI pipeline, and not on Cosmogony's servers. The agent never runs where your credentials live.</p>
 
@@ -222,5 +168,6 @@
     </footer>
 
     <script src="../script.js"></script>
+    <script src="../assets/arch-diagram.js"></script>
 </body>
 </html>
