@@ -1,6 +1,7 @@
 /**
- * Cosmogony Security Architecture Diagram
+ * Cosmogony C4-Level Architecture Diagram
  * Self-contained SVG renderer. Mounts into #cosmogony-arch-diagram.
+ * Shows high-level C4 components: CLI, Web UI, VS Code Plugin, Core, Secure Sandboxes, and Bring-Your-Own LLMs.
  */
 (function () {
   'use strict';
@@ -12,13 +13,11 @@
     accent:  '#6ee7ff',
     text:    '#e5e7eb',
     muted:   '#94a3b8',
-    danger:  '#ff6e6e',
-    warn:    '#fbbf24',
     green:   '#34d399',
     purple:  '#a78bfa',
   };
 
-  var W = 1060, H = 820;
+  var W = 1000, H = 560;
 
   function el(tag, attrs) {
     var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -38,97 +37,71 @@
     return e;
   }
 
-  // ── Zone rectangles [x, y, w, h] ─────────────────────────────────────────
-  var CORP = [10,  10, 1040, 800];   // corporate network perimeter
-  var PLAT = [30,  90,  440, 200];   // Cosmogony platform (opaque)
-  var TOOL = [30, 320,  440, 100];   // security controls strip
-  var SAND = [30, 450,  440, 180];   // ephemeral sandboxes
-  var EXT  = [510, 90,  520, 290];   // external services (right side)
-  var DEV  = [510, 420, 520, 210];   // developer devices
-  var AUDIT_ZONE = [30, 660, 1000, 100]; // audit log zone (bottom)
+  // ── C4 Zones [x, y, w, h, title, subtitle, strokeColor, dash] ────────────
+  var ZONES = [
+    [30,  24, 940, 130, 'Developer & Team Interfaces  [Thin Clients — Zero Local Code Execution]',
+     'All client surfaces connect over HTTPS; no AI-generated code ever runs on user devices', C.accent, '4 3'],
+    [30, 184, 580, 340, 'Your Controlled Environment  [Cosmogony System Boundary]',
+     'Deployed within your cloud or on-premises perimeter', C.green, '8 4'],
+    [640, 184, 330, 340, 'Connected Providers & Repositories',
+     'Configured and governed by your organisation', C.purple, '4 3'],
+  ];
 
-  // ── Nodes [id, label, sublabel, x, y, w, h, color] ───────────────────────
+  // ── C4 Containers [id, title, c4Type, desc, x, y, w, h, color] ───────────
   var NODES = [
-    // Platform — single black box
-    ['platform',   'Cosmogony Platform',     'Workflow orchestration · checkpoints · cost & team governance',
-                    50, 110, 400, 80, C.accent],
+    // Top row: CLI, UI, Plugin
+    ['cli',      'Cosmogony CLI',       '[Container: Terminal Client]',
+                 '3-column Terminal UI & scriptable CLI',
+                 55,  58, 270, 76, C.accent],
+    ['ui',       'Cosmogony Web UI',    '[Container: Web Application]',
+                 'Shared sessions, checkpoints & governance',
+                 365, 58, 270, 76, C.accent],
+    ['plugin',   'VS Code Plugin',      '[Container: IDE Extension]',
+                 'In-editor collaboration & gate reviews',
+                 675, 58, 270, 76, C.accent],
 
-    // Persistent session store — platform-owned, team-accessible
-    ['sessions',   'Shared Session Store',   'Durable sessions · stage deliverables · revision history',
-                    50, 210, 400, 56, C.accent],
+    // Inside Your Controlled Environment: Core + Secure Sandboxes
+    ['core',     'Cosmogony Core',      '[Container: Orchestration Service]',
+                 'Manages shared sessions, workflows, and human review gates',
+                 80,  228, 480, 96, C.green],
 
-    // Security controls
-    ['guardrails', 'Safety Guardrails',      'Protects main branch & secrets',
-                    50, 336, 190, 64, C.danger],
-    ['registry',   'Approved Tool Catalog',  'Admin-controlled · allowlist only',
-                    260, 336, 190, 64, C.warn],
+    ['sandboxes','Secure Sandboxes',    '[Container: Isolated Execution Environments]',
+                 'Ephemeral, single-use containers — one isolated sandbox per session',
+                 80,  384, 480, 96, C.green],
 
-    // Sandboxes
-    ['sb1',        'Workspace 1',            'isolated · single-use · clean',
-                    50, 468, 125, 72, C.muted],
-    ['sb2',        'Workspace 2',            'isolated · single-use · clean',
-                    190, 468, 125, 72, C.muted],
-    ['sb3',        'Workspace ×N',           'isolated · single-use · clean',
-                    330, 468, 125, 72, C.muted],
+    // Right column: Bring-Your-Own LLMs & GitHub
+    ['byo_llm',  'Bring-Your-Own LLMs', '[External System: AI Providers]',
+                 'OpenAI · Anthropic · Gemini · Vertex AI · Bedrock · Local',
+                 665, 228, 280, 96, C.purple],
 
-    // Egress control
-    ['egress',     'Outbound Network Filter','Blocks unauthorized external calls',
-                    140, 565, 210, 50, C.danger],
-
-    // External services
-    ['github',     'GitHub Repositories',    'Isolated feature branches · Issues · PR review gate',
-                    530, 110, 480, 56, C.green],
-    ['pkgs',       'Approved Package Sources','npm · PyPI · Go · Maven · internal mirrors',
-                    530, 186, 480, 56, C.muted],
-    ['integrations','Your AI Models',        'OpenAI · Claude · Gemini · Vertex AI · Bedrock · Local',
-                    530, 262, 480, 56, C.purple],
-
-    // Developer devices
-    ['ide',        'VS Code, CLI & Mobile',  'Control & review only — zero execution on user devices',
-                    530, 440, 480, 56, C.accent],
-    ['browser',    'Web Dashboard & Studio', 'Shared chat · approve gates · custom workflows · metrics',
-                    530, 516, 480, 56, C.accent],
-
-    // Audit log
-    ['audit',      'Activity & Audit Trail', 'Every stage document, approval, tool action & branch commit recorded',
-                    50, 678, 960, 56, C.green],
+    ['vcs',      'Source Control (Git)', '[External System: Repositories]',
+                 'Dedicated session feature branches & Pull Requests',
+                 665, 384, 280, 96, C.purple],
   ];
 
-  // ── Edges [fromId, toId, label, color] ────────────────────────────────────
+  // ── Relationships [fromId, toId, label, color] ───────────────────────────
   var EDGES = [
-    ['platform',   'guardrails', 'safety check',       C.danger],
-    ['platform',   'registry',   'verify tool access', C.warn],
-    ['platform',   'sb1',        'run in workspace',   C.muted],
-    ['platform',   'github',     'feature branch push',C.green],
-    ['platform',   'audit',      'record activity',    C.green],
-    ['egress',     'pkgs',       'approved only',      C.muted],
-    ['ide',        'platform',   'HTTPS · collaborate',C.accent],
-    ['browser',    'platform',   'HTTPS · dashboard',  C.accent],
-    ['sb1',        'egress',     'outbound traffic',   C.danger],
+    ['cli',       'core',      'HTTPS',                 C.accent],
+    ['ui',        'core',      'HTTPS',                 C.accent],
+    ['plugin',    'core',      'HTTPS',                 C.accent],
+    ['core',      'sandboxes', 'Isolated session work', C.green],
+    ['core',      'byo_llm',   'Model inference',       C.purple],
+    ['sandboxes', 'vcs',       'Feature branch & PR',   C.purple],
   ];
 
-  // ── Tooltips ──────────────────────────────────────────────────────────────
   var TIPS = {
-    platform:     'The Cosmogony platform runs inside your environment. It coordinates AI teammates across software delivery, architecture, security, and custom workflows while keeping your code and data within your perimeter.',
-    sessions:     'Durable session store that keeps chat threads, stage deliverables, workflow history, and cost metrics accessible across Web, VS Code, CLI, and Mobile.',
-    guardrails:   'Built-in safety rules ensure AI teammates work only on dedicated feature branches and can never push directly to your main branch or access sensitive platform secrets.',
-    registry:     'Admin-managed catalog of approved tools. AI teammates can only use capabilities that your organisation has explicitly enabled.',
-    sb1:          'Each session gets a brand-new, isolated cloud workspace with no secrets inside. When the session finishes, the workspace is cleanly removed.',
-    sb2:          'Each session gets a brand-new, isolated cloud workspace. Sessions are completely separated from one another.',
-    sb3:          'Scale effortlessly across concurrent team sessions—each isolated in its own single-use workspace.',
-    egress:       'Outbound network access is locked down by default. Workspaces can only reach your repository and approved package sources.',
-    github:       'All changes are committed to a dedicated session branch (cosmogony/<id>). Your team reviews the Pull Request and controls when it merges to main.',
-    pkgs:         'Approved package sources (or your internal enterprise mirrors) allow clean builds and automated verification inside the workspace.',
-    integrations: 'Connect the AI providers your organisation trusts—OpenAI, Anthropic, Google Gemini, Vertex AI, AWS Bedrock, or private local models.',
-    ide:          'Work from the VS Code extension, the 3-column Terminal CLI, or the Android mobile app. Nothing the AI generates ever executes on your personal device.',
-    browser:      'Full Web workspace for collaborating in sessions, reviewing stage deliverables, building custom workflows in the Workflow Studio, and tracking cost metrics.',
-    audit:        'Complete history of every stage deliverable, checkpoint approval, rework request, and branch commit—designed for enterprise governance and compliance.',
+    cli:       'Standalone 3-column Terminal UI and CLI for Windows, macOS, and Linux. Connects to Cosmogony Core over HTTPS with zero code execution on your workstation.',
+    ui:        'Browser workspace for collaborating in shared sessions, reviewing deliverables at checkpoints, customizing workflows, and viewing cost metrics.',
+    plugin:    'VS Code extension that brings shared AI sessions and checkpoint approvals directly alongside your editor.',
+    core:      'Central orchestration service running inside your environment. Coordinates workflows, manages shared session context, and enforces human approval checkpoints.',
+    sandboxes: 'Every session runs inside its own fresh, isolated container. Code is built and verified here—never on developer laptops—and the sandbox is destroyed when the session ends.',
+    byo_llm:   'Connect the AI providers your organisation approves—cloud providers (OpenAI, Anthropic, Google Gemini, Vertex AI, AWS Bedrock) or private self-hosted models.',
+    vcs:       'All changes are committed to an isolated session feature branch. Your team reviews and merges the Pull Request through your normal Git workflow.',
   };
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
   function nodeRect(id) {
     for (var i = 0; i < NODES.length; i++) {
-      if (NODES[i][0] === id) return { x: NODES[i][3], y: NODES[i][4], w: NODES[i][5], h: NODES[i][6] };
+      if (NODES[i][0] === id) return { x: NODES[i][4], y: NODES[i][5], w: NODES[i][6], h: NODES[i][7] };
     }
     return null;
   }
@@ -140,7 +113,7 @@
     var tc = { x: tr.x + tr.w / 2, y: tr.y + tr.h / 2 };
     var dx = tc.x - fc.x, dy = tc.y - fc.y;
     var x1, y1, x2, y2;
-    if (Math.abs(dx) >= Math.abs(dy)) {
+    if (Math.abs(dx) > Math.abs(dy) * 1.4) {
       x1 = dx > 0 ? fr.x + fr.w : fr.x;  y1 = fc.y;
       x2 = dx > 0 ? tr.x : tr.x + tr.w;  y2 = tc.y;
     } else {
@@ -151,19 +124,13 @@
   }
 
   var COLOR_MARKER = {};
-  COLOR_MARKER[C.accent]  = 'mk-acc';
-  COLOR_MARKER[C.warn]    = 'mk-wrn';
-  COLOR_MARKER[C.danger]  = 'mk-dng';
-  COLOR_MARKER[C.green]   = 'mk-grn';
-  COLOR_MARKER[C.purple]  = 'mk-pur';
-  COLOR_MARKER[C.muted]   = 'mk-mut';
-  COLOR_MARKER[C.border]  = 'mk-brd';
+  COLOR_MARKER[C.accent] = 'mk-acc';
+  COLOR_MARKER[C.green]  = 'mk-grn';
+  COLOR_MARKER[C.purple] = 'mk-pur';
 
-  // ── Build ─────────────────────────────────────────────────────────────────
   function build(container) {
-    // CSS animation
     var styleTag = document.createElement('style');
-    styleTag.textContent = '@keyframes archDash{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}.arch-edge{animation:archDash 1.4s linear infinite}';
+    styleTag.textContent = '@keyframes archDash{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}.arch-edge{animation:archDash 1.6s linear infinite}';
     document.head.appendChild(styleTag);
 
     var svg = el('svg', {
@@ -171,17 +138,15 @@
       width: '100%',
       height: 'auto',
       role: 'img',
-      'aria-label': 'Cosmogony security architecture diagram',
+      'aria-label': 'Cosmogony C4 architecture diagram showing CLI, Web UI, VS Code Plugin, Core, Secure Sandboxes, and Bring-Your-Own LLMs',
     });
     svg.style.display = 'block';
     svg.style.background = C.bg;
     svg.style.borderRadius = '14px';
     svg.style.border = '1px solid ' + C.border;
 
-    // Defs — arrowhead markers
     var defs = el('defs');
-    [['mk-acc',C.accent],['mk-wrn',C.warn],['mk-dng',C.danger],['mk-grn',C.green],
-     ['mk-pur',C.purple],['mk-mut',C.muted],['mk-brd',C.border]].forEach(function(m){
+    [['mk-acc', C.accent], ['mk-grn', C.green], ['mk-pur', C.purple]].forEach(function (m) {
       var marker = el('marker', {
         id: m[0], markerWidth: '8', markerHeight: '8',
         refX: '7', refY: '3', orient: 'auto', markerUnits: 'userSpaceOnUse',
@@ -191,130 +156,102 @@
     });
     svg.appendChild(defs);
 
-    // ── Zone backgrounds ──────────────────────────────────────────────────
-    var zones = [
-      [CORP,       'Your Environment Perimeter',
-                   'Your cloud account or on-premises environment — your data stays inside this boundary',
-                   C.accent, '8 4'],
-      [PLAT,       'Cosmogony Platform',
-                   'Coordinates workflows, sessions, and governance',
-                   C.accent, ''],
-      [TOOL,       'Safety & Governance Controls',
-                   'Checked before every action',
-                   C.warn, '4 3'],
-      [SAND,       'Isolated Session Workspaces',
-                   'One clean workspace per session · removed automatically when finished',
-                   C.muted, '4 3'],
-      [EXT,        'Connected Repositories & AI Models',
-                   'Feature-branch Git access · your approved AI providers',
-                   C.green, '6 3'],
-      [DEV,        'Team Devices (Web, IDE, CLI & Mobile)',
-                   'Collaborate & approve checkpoints — zero code execution on devices',
-                   C.accent, '4 3'],
-      [AUDIT_ZONE, 'Activity & Compliance Trail',
-                   'Full history of deliverables, approvals, and commits · ISO 27001 & SOX ready',
-                   C.green, ''],
-    ];
-
-    zones.forEach(function (z) {
-      var r = z[0];
+    // Render C4 Zones
+    ZONES.forEach(function (z) {
       svg.appendChild(el('rect', {
-        x: r[0], y: r[1], width: r[2], height: r[3],
-        rx: '10', fill: C.bg,
-        stroke: z[3], 'stroke-width': '1.5',
-        'stroke-dasharray': z[4] || '', opacity: '0.9',
+        x: z[0], y: z[1], width: z[2], height: z[3],
+        rx: '12', fill: C.bg,
+        stroke: z[6], 'stroke-width': '1.5',
+        'stroke-dasharray': z[7] || '', opacity: '0.9',
       }));
-      // Subtle zone fill
       svg.appendChild(el('rect', {
-        x: r[0] + 1, y: r[1] + 1, width: r[2] - 2, height: r[3] - 2,
-        rx: '9', fill: z[3], opacity: '0.03',
+        x: z[0] + 1, y: z[1] + 1, width: z[2] - 2, height: z[3] - 2,
+        rx: '11', fill: z[6], opacity: '0.03',
       }));
-      // Zone labels
-      svg.appendChild(txt(z[1], {
-        x: r[0] + 12, y: r[1] + 18,
-        fill: z[3], 'font-size': '10.5', 'font-weight': 'bold',
-        'font-family': "'Source Code Pro', monospace", opacity: '0.85',
+      svg.appendChild(txt(z[4], {
+        x: z[0] + 16, y: z[1] + 22,
+        fill: z[6], 'font-size': '11', 'font-weight': '700',
+        'font-family': "'Source Code Pro', monospace",
       }));
-      svg.appendChild(txt(z[2], {
-        x: r[0] + 12, y: r[1] + r[3] - 8,
-        fill: C.muted, 'font-size': '9',
-        'font-family': "'Source Code Pro', monospace", opacity: '0.55',
+      svg.appendChild(txt(z[5], {
+        x: z[0] + 16, y: z[1] + z[3] - 10,
+        fill: C.muted, 'font-size': '9.5',
+        'font-family': "'Source Code Pro', monospace", opacity: '0.7',
       }));
     });
 
-    // ── Edges ──────────────────────────────────────────────────────────────
+    // Render Edges
     EDGES.forEach(function (edge) {
       var pts = edgePts(edge[0], edge[1]);
       if (!pts) return;
       var markerId = COLOR_MARKER[edge[3]] || 'mk-acc';
       svg.appendChild(el('path', {
-        d: 'M' + pts.x1 + ',' + pts.y1 + ' Q' + pts.mx + ',' + pts.my + ' ' + pts.x2 + ',' + pts.y2,
-        fill: 'none', stroke: edge[3], 'stroke-width': '1.5',
-        'stroke-dasharray': '6 3', 'marker-end': 'url(#' + markerId + ')',
-        opacity: '0.6', class: 'arch-edge',
+        d: 'M' + pts.x1 + ',' + pts.y1 + ' L' + pts.x2 + ',' + pts.y2,
+        fill: 'none', stroke: edge[3], 'stroke-width': '1.75',
+        'stroke-dasharray': '6 4', 'marker-end': 'url(#' + markerId + ')',
+        opacity: '0.75', class: 'arch-edge',
       }));
       if (edge[2]) {
-        var lw = edge[2].length * 5.6 + 10;
+        var lw = edge[2].length * 5.8 + 14;
         svg.appendChild(el('rect', {
-          x: pts.mx - lw / 2, y: pts.my - 9, width: lw, height: 13,
-          rx: '3', fill: C.bg, opacity: '0.9',
+          x: pts.mx - lw / 2, y: pts.my - 10, width: lw, height: 16,
+          rx: '4', fill: C.bg, stroke: C.border, 'stroke-width': '1', opacity: '0.95',
         }));
         svg.appendChild(txt(edge[2], {
-          x: pts.mx, y: pts.my + 1, fill: edge[3],
-          'font-size': '8.5', 'text-anchor': 'middle',
-          'font-family': "'Source Code Pro', monospace", opacity: '0.95',
+          x: pts.mx, y: pts.my + 2, fill: edge[3],
+          'font-size': '9', 'font-weight': '600', 'text-anchor': 'middle',
+          'font-family': "'Source Code Pro', monospace",
         }));
       }
     });
 
-    // ── Nodes ──────────────────────────────────────────────────────────────
+    // Tooltip element
     var tip = document.createElement('div');
-    tip.style.cssText = 'display:none;position:fixed;z-index:9999;background:#0e1628;border:1px solid #1f2a44;border-left:3px solid #6ee7ff;border-radius:8px;padding:10px 14px;max-width:280px;pointer-events:none;font-family:"Source Code Pro",monospace;box-shadow:0 8px 32px rgba(0,0,0,0.7)';
+    tip.style.cssText = 'display:none;position:fixed;z-index:9999;background:#0e1628;border:1px solid #1f2a44;border-left:3px solid #6ee7ff;border-radius:8px;padding:10px 14px;max-width:290px;pointer-events:none;font-family:"Source Code Pro",monospace;box-shadow:0 8px 32px rgba(0,0,0,0.7)';
     document.body.appendChild(tip);
 
+    // Render C4 Containers
     NODES.forEach(function (n) {
-      var id = n[0], label = n[1], sub = n[2];
-      var nx = n[3], ny = n[4], nw = n[5], nh = n[6], color = n[7];
+      var id = n[0], title = n[1], c4Type = n[2], desc = n[3];
+      var nx = n[4], ny = n[5], nw = n[6], nh = n[7], color = n[8];
 
       var g = el('g');
       g.style.cursor = 'pointer';
 
-      // Shadow
       g.appendChild(el('rect', {
         x: nx + 3, y: ny + 4, width: nw, height: nh,
-        rx: '7', fill: '#000', opacity: '0.35',
+        rx: '9', fill: '#000', opacity: '0.35',
       }));
 
-      // Body
       var body = el('rect', {
         x: nx, y: ny, width: nw, height: nh,
-        rx: '7', fill: C.panel, stroke: color, 'stroke-width': '1.5',
+        rx: '9', fill: C.panel, stroke: color, 'stroke-width': '1.5',
       });
       g.appendChild(body);
 
-      // Left accent bar
       g.appendChild(el('rect', {
-        x: nx, y: ny + 8, width: '3', height: nh - 16,
-        rx: '1.5', fill: color, opacity: '0.9',
+        x: nx, y: ny + 10, width: '3.5', height: nh - 20,
+        rx: '1.5', fill: color, opacity: '0.95',
       }));
 
-      // Label
-      g.appendChild(txt(label, {
-        x: nx + 14, y: ny + (sub ? nh / 2 - 3 : nh / 2 + 4),
-        fill: C.text, 'font-size': '11', 'font-weight': '700',
-        'font-family': "'Source Code Pro', monospace", 'dominant-baseline': 'middle',
+      g.appendChild(txt(title, {
+        x: nx + nw / 2, y: ny + 24,
+        fill: C.text, 'font-size': '12.5', 'font-weight': '700',
+        'font-family': "'Source Code Pro', monospace", 'text-anchor': 'middle',
       }));
 
-      // Sub-label
-      if (sub) {
-        g.appendChild(txt(sub, {
-          x: nx + 14, y: ny + nh / 2 + 11,
-          fill: C.muted, 'font-size': '8.5',
-          'font-family': "'Source Code Pro', monospace", 'dominant-baseline': 'middle',
-        }));
-      }
+      g.appendChild(txt(c4Type, {
+        x: nx + nw / 2, y: ny + 42,
+        fill: color, 'font-size': '9', 'font-weight': '500',
+        'font-family': "'Source Code Pro', monospace", 'text-anchor': 'middle', opacity: '0.9',
+      }));
 
-      // Hover
+      g.appendChild(txt(desc, {
+        x: nx + nw / 2, y: ny + 62,
+        fill: C.muted, 'font-size': '9.5',
+        'font-family': "'Source Code Pro', monospace", 'text-anchor': 'middle',
+      }));
+
       g.addEventListener('mouseenter', function () {
         body.setAttribute('stroke-width', '2.5');
       });
@@ -327,10 +264,10 @@
       if (tipText) {
         g.addEventListener('mousemove', function (e) {
           tip.innerHTML = '<div style="font-size:12px;font-weight:700;color:#e5e7eb;margin-bottom:6px">' +
-            label + '</div><div style="font-size:11px;color:#94a3b8;line-height:1.6">' + tipText + '</div>';
+            title + '</div><div style="font-size:11px;color:#94a3b8;line-height:1.6">' + tipText + '</div>';
           tip.style.display = 'block';
           var left = e.clientX + 16;
-          if (left + 290 > window.innerWidth) left = e.clientX - 294;
+          if (left + 300 > window.innerWidth) left = e.clientX - 304;
           tip.style.left = left + 'px';
           tip.style.top = (e.clientY - 8) + 'px';
         });
@@ -339,39 +276,16 @@
       svg.appendChild(g);
     });
 
-    // ── Legend ──────────────────────────────────────────────────────────────
-    var legend = [
-      [C.accent, 'Platform & Clients'],
-      [C.warn,   'Governance controls'],
-      [C.danger, 'Safety & network filter'],
-      [C.green,  'GitHub & Audit trail'],
-      [C.muted,  'Isolated workspaces'],
-    ];
-    var lx = 30, ly = H - 10;
-    legend.forEach(function (item, i) {
-      var ox = lx + i * 200;
-      svg.appendChild(el('rect', { x: ox, y: ly - 9, width: 10, height: 10, rx: '2', fill: item[0] }));
-      svg.appendChild(txt(item[1], {
-        x: ox + 14, y: ly, fill: C.muted, 'font-size': '9.5',
-        'font-family': "'Source Code Pro', monospace",
-      }));
-    });
-
     container.appendChild(svg);
   }
 
-  // ── Mount ─────────────────────────────────────────────────────────────────
   function mount() {
     var container = document.getElementById('cosmogony-arch-diagram');
-    if (!container) {
-      console.warn('[arch-diagram] #cosmogony-arch-diagram not found');
-      return;
-    }
+    if (!container) return;
     try {
       build(container);
     } catch (err) {
       console.error('[arch-diagram] render error:', err);
-      container.innerHTML = '<p style="color:#94a3b8;padding:24px;font-family:monospace;font-size:13px">Diagram failed to render. Check console.</p>';
     }
   }
 
@@ -380,5 +294,4 @@
   } else {
     mount();
   }
-
 }());

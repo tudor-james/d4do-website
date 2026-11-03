@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cosmogony Security Model — Secure by design. Every session runs in an isolated cloud workspace inside your perimeter on a dedicated feature branch.">
+    <meta name="description" content="Cosmogony Security Model — High-level C4 architecture showing CLI, Web UI, VS Code Plugin, Core, Secure Sandboxes, and Bring-Your-Own LLMs.">
     <meta name="author" content="AJ James">
     <title>Secure by Design — Cosmogony</title>
     <link rel="stylesheet" href="../styles.css">
@@ -38,79 +38,56 @@
                 <a href="../index.html#why" class="back-nav">← Back to Cosmogony</a>
 
                 <h1>Secure by Design</h1>
-                <p style="font-size: 18px; color: var(--accent); margin-bottom: 40px;">How Cosmogony protects your code, your credentials, and your devices—while helping your team model threats proactively</p>
+                <p style="font-size: 18px; color: var(--accent); margin-bottom: 40px;">How Cosmogony separates user devices, orchestration, isolated sandboxes, and your AI models to keep your environment safe</p>
 
                 <h2>Why Traditional AI Coding Tools Create Risk</h2>
 
-                <p>Most AI tools run generated code directly on a developer's laptop, inside a shared build pipeline, or in an external vendor cloud. That creates three major risks:</p>
+                <p>Most AI tools run generated code directly on a developer's laptop, inside a shared build pipeline, or in an unmanaged vendor cloud:</p>
 
                 <div class="security-grid" style="margin-bottom: 32px;">
                     <div class="security-card" style="border-color: color-mix(in srgb, #ff6e6e 30%, var(--border));">
                         <h4 style="color: #ff9e9e;">Running on developer laptops</h4>
-                        <p>When AI runs commands on a personal workstation, it can reach local files, saved passwords, cloud keys, and active browser sessions.</p>
+                        <p>When AI runs commands on a personal workstation, it can reach local files, saved credentials, cloud keys, and active browser sessions.</p>
                     </div>
                     <div class="security-card" style="border-color: color-mix(in srgb, #ff6e6e 30%, var(--border));">
                         <h4 style="color: #ff9e9e;">Running inside deployment pipelines</h4>
-                        <p>Giving AI direct access to production pipelines exposes deployment secrets and broad permissions that were meant for locked-down automation.</p>
+                        <p>Giving AI direct access to production pipelines exposes deployment secrets and broad permissions meant only for locked-down releases.</p>
                     </div>
                     <div class="security-card" style="border-color: color-mix(in srgb, #ff6e6e 30%, var(--border));">
-                        <h4 style="color: #ff9e9e;">Sending code outside your perimeter</h4>
-                        <p>When your source code and data are processed in an unmanaged third-party environment, you lose visibility and control over your security boundary.</p>
+                        <h4 style="color: #ff9e9e;">Locked into a single vendor cloud</h4>
+                        <p>When you cannot bring your own approved AI endpoints or control where workspaces run, you lose governance over your code and data.</p>
                     </div>
                 </div>
 
-                <div class="callout">
-                    <strong>Our approach:</strong> Cosmogony never runs AI-generated code on your personal devices and never gives AI direct access to your production environment. Every session works inside a clean, isolated workspace governed by strict platform rules.
-                </div>
-
-                <h2>Isolated Workspaces Inside Your Environment</h2>
+                <h2>High-Level C4 Architecture</h2>
 
                 <div id="cosmogony-arch-diagram" style="margin: 32px 0; border-radius: 14px; overflow: hidden;"></div>
                 <p style="font-size: 12px; color: var(--muted); text-align: center; margin-top: -20px; margin-bottom: 32px;">Hover any component for details</p>
 
-                <p>Every Cosmogony session runs inside a fresh, single-use workspace provisioned within <em>your</em> hosted environment. Whether your team connects from the Web dashboard, VS Code, Terminal CLI, or the Android mobile app, their device is purely a control and review interface—never an execution environment.</p>
+                <p>Cosmogony is structured around a clean separation of concerns across four key layers:</p>
 
                 <div class="security-grid">
                     <div class="security-card">
-                        <h4>Your environment, your rules</h4>
-                        <p>Deploy Cosmogony in your own cloud or on-premises environment so your data governance, privacy policies, and security controls apply automatically.</p>
+                        <h4>CLI, Web UI &amp; VS Code Plugin</h4>
+                        <p>Your team works through lightweight client interfaces—the 3-column Terminal CLI, the Web UI dashboard, or the VS Code Plugin. Nothing the AI generates ever executes on your personal device.</p>
                     </div>
                     <div class="security-card">
-                        <h4>One clean workspace per session</h4>
-                        <p>Each session gets a brand-new, isolated workspace that is automatically removed when the session ends—no leftover state and no cross-project exposure.</p>
+                        <h4>Cosmogony Core</h4>
+                        <p>Runs inside your controlled environment to coordinate shared sessions, manage workflows, enforce human review checkpoints, and track cost and team governance.</p>
                     </div>
                     <div class="security-card">
-                        <h4>Secrets stay out of reach</h4>
-                        <p>Organisation secrets, database passwords, and AI provider keys are managed securely by the platform and are never exposed inside the session workspace.</p>
+                        <h4>Secure Sandboxes</h4>
+                        <p>Every session executes in its own isolated, single-use sandbox container. Changes are built, tested, and pushed to a dedicated feature branch—never touching your main branch directly.</p>
                     </div>
                     <div class="security-card">
-                        <h4>Safe across Web, IDE, CLI &amp; Mobile</h4>
-                        <p>Nothing the AI builds or tests runs on your laptop or phone. Every client app is a lightweight, secure interface for chatting and approving checkpoints.</p>
-                    </div>
-                    <div class="security-card">
-                        <h4>Protected main branches</h4>
-                        <p>AI teammates work exclusively on dedicated session feature branches (`cosmogony/&lt;id&gt;`). They can never push directly to your `main` or production branch.</p>
-                    </div>
-                    <div class="security-card">
-                        <h4>Ready for private &amp; air-gapped networks</h4>
-                        <p>Run entirely within private networks using internal package mirrors and self-hosted or VPC-hosted AI models when regulations require zero public internet traffic.</p>
+                        <h4>Bring-Your-Own LLMs</h4>
+                        <p>Connect the AI providers your organisation already approves—including OpenAI, Anthropic, Google Gemini, Vertex AI, AWS Bedrock, or private local models—with zero vendor lock-in.</p>
                     </div>
                 </div>
 
                 <h2>Built-In Security Threat Modeling</h2>
 
-                <p>Security in Cosmogony isn't just about how the platform runs—it's also a built-in workflow your team can run on any project. Selecting the Security Threat Modeling workflow guides specialist AI teammates to evaluate your application boundaries, identify potential attack surfaces and risks, and produce actionable security recommendations that your team can review and turn directly into delivery tasks.</p>
-
-                <h2>Admin-Controlled Tools &amp; Access Governance</h2>
-
-                <p>Organisation administrators have complete control over who can access the workspace and which tools AI teammates are allowed to use:</p>
-
-                <ul>
-                    <li><strong>GitHub Sign-In &amp; Invitation Approvals:</strong> Authenticate users with GitHub and control membership across organisations, teams, and projects.</li>
-                    <li><strong>Approved Tool Catalog:</strong> AI teammates can only use tools and integrations that an administrator has explicitly enabled for the organisation.</li>
-                    <li><strong>Locked-Down Network Access:</strong> Session workspaces can only reach your project repository and approved package sources—blocking unauthorized external connections by default.</li>
-                    <li><strong>Complete Activity &amp; Audit History:</strong> Every stage deliverable, checkpoint decision, tool action, and branch commit is recorded with clear user and session attribution.</li>
-                </ul>
+                <p>Security in Cosmogony isn't just about how the platform is architected—it's also a built-in workflow your team can run on any project. Teams can launch a dedicated Security Threat Modeling session to evaluate application boundaries, identify potential risks, and produce actionable security recommendations before code ships.</p>
 
             </section>
         </div>
