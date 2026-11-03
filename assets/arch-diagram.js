@@ -109,7 +109,7 @@
 
   // ── Tooltips ──────────────────────────────────────────────────────────────
   var TIPS = {
-    platform:     'The Cosmogony platform runs inside your environment. It coordinates AI teammates across RADPI, BAC4, STARC, and custom workflows while keeping your code and data within your perimeter.',
+    platform:     'The Cosmogony platform runs inside your environment. It coordinates AI teammates across software delivery, architecture, security, and custom workflows while keeping your code and data within your perimeter.',
     sessions:     'Durable session store that keeps chat threads, stage deliverables, workflow history, and cost metrics accessible across Web, VS Code, CLI, and Mobile.',
     guardrails:   'Built-in safety rules ensure AI teammates work only on dedicated feature branches and can never push directly to your main branch or access sensitive platform secrets.',
     registry:     'Admin-managed catalog of approved tools. AI teammates can only use capabilities that your organisation has explicitly enabled.',

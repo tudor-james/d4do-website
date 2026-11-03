@@ -45,71 +45,75 @@
                 <p>You bring your repositories, your CI/CD pipeline, your cloud environment, and your preferred AI models. Cosmogony works on an isolated session branch and prepares verified deliverables and pull requests. Your existing code review and release pipelines remain the final authority for everything that ships to production.</p>
 
                 <div class="callout">
-                    <strong>Cosmogony prepares the branch; your team owns the merge.</strong> Every session works on a dedicated feature branch (`cosmogony/&lt;session-id&gt;`). Your team reviews the deliverables and merges the pull request using your standard GitHub workflow.
+                    <strong>Cosmogony prepares the branch; your team owns the merge.</strong> Every session works on a dedicated feature branch. Your team reviews the deliverables and merges the pull request using your standard GitHub workflow.
                 </div>
 
-                <pre class="arch-diagram">
-  IDEA, BRIEF, OR GITHUB ISSUE
-           │
-           ▼
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │  Cosmogony Workspace  (Web · VS Code · Terminal CLI · Android Mobile)   │
-  │                                                                         │
-  │  Workflows: Software (RADPI) · Architecture (BAC4) · Security (STARC)   │
-  │  Requirements → Analyse → Design → Plan → Implement → Verify            │
-  │       │            │         │       │        │          │              │
-  │    [gate]       [gate]    [gate]  [gate]   [check]    [gate]            │
-  │                                                                         │
-  │  Isolated cloud workspace · Dedicated feature branch · Cost &amp; metrics   │
-  └──────────────────────────────────┬──────────────────────────────────────┘
-                                     │
-                          pushes verified branch &amp; PR
-                                     │
-                                     ▼
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │  YOUR EXISTING SOURCE CONTROL (GitHub)                                  │
-  │                                                                         │
-  │  Team code review → approval → merge to main                            │
-  └──────────────────────────────────┬──────────────────────────────────────┘
-                                     │  merge triggers your pipeline
-                                     ▼
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │  YOUR EXISTING CI/CD PIPELINE (Unchanged)                               │
-  │                                                                         │
-  │  build  →  test  →  security scan  →  staging deploy  →  prod deploy    │
-  │                                                                         │
-  │  Your governance · Your approvals · Your compliance controls            │
-  └─────────────────────────────────────────────────────────────────────────┘
-</pre>
+                <div style="margin: 32px 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: #050b18; padding: 24px 16px;">
+                    <svg viewBox="0 0 900 180" width="100%" height="auto" role="img" aria-label="Cosmogony enterprise integration flow diagram" style="display: block;">
+                        <defs>
+                            <marker id="ent-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                                <path d="M0,0 L0,8 L8,4 z" fill="#6ee7ff" />
+                            </marker>
+                        </defs>
+
+                        <line x1="205" y1="90" x2="245" y2="90" stroke="#6ee7ff" stroke-width="2" marker-end="url(#ent-arrow)" />
+                        <line x1="455" y1="90" x2="495" y2="90" stroke="#6ee7ff" stroke-width="2" marker-end="url(#ent-arrow)" />
+                        <line x1="675" y1="90" x2="715" y2="90" stroke="#6ee7ff" stroke-width="2" marker-end="url(#ent-arrow)" />
+
+                        <!-- Box 1 -->
+                        <rect x="20" y="42" width="185" height="96" rx="10" fill="#0e1628" stroke="#6ee7ff" stroke-width="1.5" />
+                        <text x="112" y="76" fill="#6ee7ff" font-family="'Source Code Pro', monospace" font-size="11" font-weight="700" text-anchor="middle">Your Brief or Issue</text>
+                        <text x="112" y="98" fill="#94a3b8" font-family="'Source Code Pro', monospace" font-size="9.5" text-anchor="middle">Business goal, doc,</text>
+                        <text x="112" y="114" fill="#94a3b8" font-family="'Source Code Pro', monospace" font-size="9.5" text-anchor="middle">or GitHub ticket</text>
+
+                        <!-- Box 2 -->
+                        <rect x="245" y="42" width="210" height="96" rx="10" fill="#0e1628" stroke="#6ee7ff" stroke-width="1.5" />
+                        <text x="350" y="76" fill="#6ee7ff" font-family="'Source Code Pro', monospace" font-size="11" font-weight="700" text-anchor="middle">Cosmogony Workspace</text>
+                        <text x="350" y="98" fill="#94a3b8" font-family="'Source Code Pro', monospace" font-size="9.5" text-anchor="middle">AI teammates · Checkpoints</text>
+                        <text x="350" y="114" fill="#94a3b8" font-family="'Source Code Pro', monospace" font-size="9.5" text-anchor="middle">Isolated feature branch</text>
+
+                        <!-- Box 3 -->
+                        <rect x="495" y="42" width="180" height="96" rx="10" fill="#0e1628" stroke="#34d399" stroke-width="1.5" />
+                        <text x="585" y="76" fill="#34d399" font-family="'Source Code Pro', monospace" font-size="11" font-weight="700" text-anchor="middle">Your Source Control</text>
+                        <text x="585" y="98" fill="#94a3b8" font-family="'Source Code Pro', monospace" font-size="9.5" text-anchor="middle">Standard PR review</text>
+                        <text x="585" y="114" fill="#94a3b8" font-family="'Source Code Pro', monospace" font-size="9.5" text-anchor="middle">&amp; team merge to main</text>
+
+                        <!-- Box 4 -->
+                        <rect x="715" y="42" width="165" height="96" rx="10" fill="#0e1628" stroke="#34d399" stroke-width="1.5" />
+                        <text x="797" y="76" fill="#34d399" font-family="'Source Code Pro', monospace" font-size="11" font-weight="700" text-anchor="middle">Your CI/CD Pipeline</text>
+                        <text x="797" y="98" fill="#94a3b8" font-family="'Source Code Pro', monospace" font-size="9.5" text-anchor="middle">Unchanged release</text>
+                        <text x="797" y="114" fill="#94a3b8" font-family="'Source Code Pro', monospace" font-size="9.5" text-anchor="middle">&amp; compliance controls</text>
+                    </svg>
+                </div>
 
                 <h2>Bring Your Own AI Models</h2>
 
                 <p>Cosmogony is completely model-agnostic. Connect the AI providers your organisation has already approved—including <strong>OpenAI</strong>, <strong>Anthropic Claude</strong>, <strong>Google Gemini</strong>, <strong>Google Cloud Vertex AI</strong>, <strong>AWS Bedrock</strong>, <strong>OpenRouter</strong>, or private local models via <strong>Ollama</strong> and <strong>LM Studio</strong>.</p>
 
-                <p>You can set sensible defaults at the organisation or project level, or choose specific models for individual sessions and workflow stages to balance speed, capability, and cost—with zero vendor lock-in.</p>
+                <p>You can set sensible defaults at the organisation or project level, or choose specific models for individual sessions to balance speed, capability, and cost—with zero vendor lock-in.</p>
 
                 <h2>Custom Workflow Studio</h2>
 
-                <p>Every organisation has its own way of working. In addition to ready-made workflows for Software Delivery (<strong>RADPI</strong>), Enterprise Architecture (<strong>BAC4</strong>), and Security Threat Modeling (<strong>STARC</strong>), administrators can use the <strong>Workflow Studio</strong> to:</p>
+                <p>Every organisation has its own way of working. In addition to ready-made workflows for Software Delivery, Enterprise Architecture, and Security Threat Modeling, administrators can use the <strong>Workflow Studio</strong> to:</p>
 
                 <ul>
-                    <li>Inspect how each workflow stage and AI specialist team is structured.</li>
-                    <li>Customize stage instructions, review gates, and AI model tiers to reflect your internal standards.</li>
-                    <li>Publish immutable, versioned workflows so teams always run on a consistent, auditable process.</li>
+                    <li>Tailor workflows and specialist AI roles to reflect your internal delivery standards.</li>
+                    <li>Configure review checkpoints and model preferences for different types of work.</li>
+                    <li>Publish versioned workflows so teams always run on a consistent, auditable process.</li>
                 </ul>
 
                 <h2>Real-Time Cost &amp; Efficiency Visibility</h2>
 
-                <p>Scaling AI across an engineering organisation requires clear visibility into return on investment. Cosmogony includes built-in <strong>Tokenomics &amp; Efficiency Metrics</strong> across sessions and projects:</p>
+                <p>Scaling AI across an engineering organisation requires clear visibility into return on investment. Cosmogony includes built-in <strong>Cost &amp; Efficiency Metrics</strong> across sessions and projects:</p>
 
                 <div class="security-grid">
                     <div class="security-card">
-                        <h4>Stage-by-Stage Cost Breakdown</h4>
-                        <p>See exact token usage and cost across Requirements, Analysis, Design, Planning, Implementation, and Verification.</p>
+                        <h4>Clear Cost Breakdown</h4>
+                        <p>Track token usage and cost across every session, project, and team in real time.</p>
                     </div>
                     <div class="security-card">
-                        <h4>Run Efficiency Tracking</h4>
-                        <p>Measure how smoothly tasks progress through each stage and compare efficiency across runs and models.</p>
+                        <h4>Delivery Efficiency Insights</h4>
+                        <p>Measure how smoothly tasks progress from start to finish and compare efficiency across runs and models.</p>
                     </div>
                     <div class="security-card">
                         <h4>Guided Setup Wizard</h4>
