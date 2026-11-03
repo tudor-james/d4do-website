@@ -50,79 +50,79 @@
   // ── Nodes [id, label, sublabel, x, y, w, h, color] ───────────────────────
   var NODES = [
     // Platform — single black box
-    ['platform',   'Cosmogony Platform',   'Agent orchestration · tool dispatch · session management',
+    ['platform',   'Cosmogony Platform',     'Workflow orchestration · checkpoints · cost & team governance',
                     50, 110, 400, 80, C.accent],
 
     // Persistent session store — platform-owned, team-accessible
-    ['sessions',   'Session Store',        'Persistent · platform-owned · team-accessible',
+    ['sessions',   'Shared Session Store',   'Durable sessions · stage deliverables · revision history',
                     50, 210, 400, 56, C.accent],
 
     // Security controls
-    ['guardrails', 'Safety Guardrails',    'Code-immutable pre-exec rules',
+    ['guardrails', 'Safety Guardrails',      'Protects main branch & secrets',
                     50, 336, 190, 64, C.danger],
-    ['registry',   'Tool Registry',        'Deny-by-default · org allowlist',
+    ['registry',   'Approved Tool Catalog',  'Admin-controlled · allowlist only',
                     260, 336, 190, 64, C.warn],
 
     // Sandboxes
-    ['sb1',        'Sandbox',              'ephemeral · non-root · egress DROP',
+    ['sb1',        'Workspace 1',            'isolated · single-use · clean',
                     50, 468, 125, 72, C.muted],
-    ['sb2',        'Sandbox',              'ephemeral · non-root · egress DROP',
+    ['sb2',        'Workspace 2',            'isolated · single-use · clean',
                     190, 468, 125, 72, C.muted],
-    ['sb3',        'Sandbox ×N',           'ephemeral · non-root · egress DROP',
+    ['sb3',        'Workspace ×N',           'isolated · single-use · clean',
                     330, 468, 125, 72, C.muted],
 
     // Egress control
-    ['egress',     'Network Egress',       'iptables · DROP all · allowlist only',
+    ['egress',     'Outbound Network Filter','Blocks unauthorized external calls',
                     140, 565, 210, 50, C.danger],
 
     // External services
-    ['github',     'VCS / GitHub',         'Bot identity · feature branches only · PR gate',
+    ['github',     'GitHub Repositories',    'Isolated feature branches · Issues · PR review gate',
                     530, 110, 480, 56, C.green],
-    ['pkgs',       'Package Registries',   'npm · pypi · maven · go · crates.io',
+    ['pkgs',       'Approved Package Sources','npm · PyPI · Go · Maven · internal mirrors',
                     530, 186, 480, 56, C.muted],
-    ['integrations','Future Integrations', 'Coming soon · same controls apply',
-                    530, 262, 480, 56, C.border],
+    ['integrations','Your AI Models',        'OpenAI · Claude · Gemini · Vertex AI · Bedrock · Local',
+                    530, 262, 480, 56, C.purple],
 
     // Developer devices
-    ['ide',        'Cosmogony IDE',        'UI only — no execution on device',
+    ['ide',        'VS Code, CLI & Mobile',  'Control & review only — zero execution on user devices',
                     530, 440, 480, 56, C.accent],
-    ['browser',    'Browser / Dashboard',  'Chat · approve gates · review PRs',
+    ['browser',    'Web Dashboard & Studio', 'Shared chat · approve gates · custom workflows · metrics',
                     530, 516, 480, 56, C.accent],
 
     // Audit log
-    ['audit',      'Audit Log',            'Append-only · every tool call · every file write · full attribution',
+    ['audit',      'Activity & Audit Trail', 'Every stage document, approval, tool action & branch commit recorded',
                     50, 678, 960, 56, C.green],
   ];
 
   // ── Edges [fromId, toId, label, color] ────────────────────────────────────
   var EDGES = [
-    ['platform',   'guardrails', 'pre-exec check',    C.danger],
-    ['platform',   'registry',   'validate tool call', C.warn],
-    ['platform',   'sb1',        'dispatch to sandbox', C.muted],
-    ['platform',   'github',     'bot push',           C.green],
-    ['platform',   'audit',      'log everything',     C.green],
-    ['egress',     'pkgs',       'allowlist only',     C.muted],
-    ['ide',        'platform',   'HTTPS · chat',       C.accent],
-    ['browser',    'platform',   'HTTPS · UI',         C.accent],
+    ['platform',   'guardrails', 'safety check',       C.danger],
+    ['platform',   'registry',   'verify tool access', C.warn],
+    ['platform',   'sb1',        'run in workspace',   C.muted],
+    ['platform',   'github',     'feature branch push',C.green],
+    ['platform',   'audit',      'record activity',    C.green],
+    ['egress',     'pkgs',       'approved only',      C.muted],
+    ['ide',        'platform',   'HTTPS · collaborate',C.accent],
+    ['browser',    'platform',   'HTTPS · dashboard',  C.accent],
     ['sb1',        'egress',     'outbound traffic',   C.danger],
   ];
 
   // ── Tooltips ──────────────────────────────────────────────────────────────
   var TIPS = {
-    platform:     'The Cosmogony platform runs entirely within your infrastructure. It orchestrates agents, dispatches tools, and manages sessions. No code or data leaves your network.',
-    sessions:     'Persistent session store owned by the platform. Stores chat history, task state, and audit references. Accessible by all team members with appropriate permissions.',
-    guardrails:   'Code-immutable safety rules evaluated before any shell command runs. Blocks pushes to default branch, git history rewrites, credential access, and workspace destruction.',
-    registry:     'Deny-by-default tool registry. Agents can only call tools that an org admin has explicitly registered. Unknown or hallucinated tool names are rejected immediately.',
-    sb1:          'Ephemeral container per session. Non-root user, no secrets injected, network egress DROP by default. Destroyed completely at session end — worst case is a dead container, not a compromised host.',
-    sb2:          'Ephemeral container per session. Non-root user, no secrets injected, network egress DROP by default. Destroyed completely at session end.',
-    sb3:          'Ephemeral container per session. Non-root user, no secrets injected, network egress DROP by default. Destroyed completely at session end.',
-    egress:       'Network egress enforced at the container level via iptables. All outbound traffic DROPped by default. Only approved package registries and org-configured endpoints are reachable.',
-    github:       'Platform bot identity pushes to feature branches only. The platform opens PRs — humans approve and merge. No agent can push directly to your default branch.',
-    pkgs:         'Package registries (npm, PyPI, Maven, Go, crates.io) are always-allowed in the sandbox egress ACL — required for dependency installation during builds.',
-    integrations: 'Future integrations (issue trackers, databases, monitoring) will connect through the same proxy with the same deny-by-default controls.',
-    ide:          'Cosmogony IDE — a thin client. Nothing the agent generates runs on your device. Your machine is a UI, not an execution environment.',
-    browser:      'Web dashboard for chat, reviewing PRs, approving gates, and managing team settings.',
-    audit:        'Append-only audit log. Every tool call, file write, command executed, and gate result stored with session ID, user, timestamp, exit code, and network bytes.',
+    platform:     'The Cosmogony platform runs inside your environment. It coordinates AI teammates across RADPI, BAC4, STARC, and custom workflows while keeping your code and data within your perimeter.',
+    sessions:     'Durable session store that keeps chat threads, stage deliverables, workflow history, and cost metrics accessible across Web, VS Code, CLI, and Mobile.',
+    guardrails:   'Built-in safety rules ensure AI teammates work only on dedicated feature branches and can never push directly to your main branch or access sensitive platform secrets.',
+    registry:     'Admin-managed catalog of approved tools. AI teammates can only use capabilities that your organisation has explicitly enabled.',
+    sb1:          'Each session gets a brand-new, isolated cloud workspace with no secrets inside. When the session finishes, the workspace is cleanly removed.',
+    sb2:          'Each session gets a brand-new, isolated cloud workspace. Sessions are completely separated from one another.',
+    sb3:          'Scale effortlessly across concurrent team sessions—each isolated in its own single-use workspace.',
+    egress:       'Outbound network access is locked down by default. Workspaces can only reach your repository and approved package sources.',
+    github:       'All changes are committed to a dedicated session branch (cosmogony/<id>). Your team reviews the Pull Request and controls when it merges to main.',
+    pkgs:         'Approved package sources (or your internal enterprise mirrors) allow clean builds and automated verification inside the workspace.',
+    integrations: 'Connect the AI providers your organisation trusts—OpenAI, Anthropic, Google Gemini, Vertex AI, AWS Bedrock, or private local models.',
+    ide:          'Work from the VS Code extension, the 3-column Terminal CLI, or the Android mobile app. Nothing the AI generates ever executes on your personal device.',
+    browser:      'Full Web workspace for collaborating in sessions, reviewing stage deliverables, building custom workflows in the Workflow Studio, and tracking cost metrics.',
+    audit:        'Complete history of every stage deliverable, checkpoint approval, rework request, and branch commit—designed for enterprise governance and compliance.',
   };
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -193,26 +193,26 @@
 
     // ── Zone backgrounds ──────────────────────────────────────────────────
     var zones = [
-      [CORP,       'Your Infrastructure Perimeter',
-                   'Your cloud account or on-premises — nothing leaves this boundary',
+      [CORP,       'Your Environment Perimeter',
+                   'Your cloud account or on-premises environment — your data stays inside this boundary',
                    C.accent, '8 4'],
       [PLAT,       'Cosmogony Platform',
-                   'Runs entirely within your perimeter',
+                   'Coordinates workflows, sessions, and governance',
                    C.accent, ''],
-      [TOOL,       'Security Controls',
-                   'Evaluated before every action',
+      [TOOL,       'Safety & Governance Controls',
+                   'Checked before every action',
                    C.warn, '4 3'],
-      [SAND,       'Ephemeral Sandboxes',
-                   'One per session · isolated network · destroyed on end',
+      [SAND,       'Isolated Session Workspaces',
+                   'One clean workspace per session · removed automatically when finished',
                    C.muted, '4 3'],
-      [EXT,        'External Services',
-                   'Reached only via allowlisted egress · bot identity',
+      [EXT,        'Connected Repositories & AI Models',
+                   'Feature-branch Git access · your approved AI providers',
                    C.green, '6 3'],
-      [DEV,        'Developer Devices',
-                   'UI only — no agent execution here',
+      [DEV,        'Team Devices (Web, IDE, CLI & Mobile)',
+                   'Collaborate & approve checkpoints — zero code execution on devices',
                    C.accent, '4 3'],
-      [AUDIT_ZONE, 'Audit & Compliance',
-                   'Append-only · ISO 27001 · SOX ready',
+      [AUDIT_ZONE, 'Activity & Compliance Trail',
+                   'Full history of deliverables, approvals, and commits · ISO 27001 & SOX ready',
                    C.green, ''],
     ];
 
@@ -341,11 +341,11 @@
 
     // ── Legend ──────────────────────────────────────────────────────────────
     var legend = [
-      [C.accent, 'Platform'],
-      [C.warn,   'Security controls'],
-      [C.danger, 'Guardrails / egress'],
-      [C.green,  'Audit / VCS'],
-      [C.muted,  'Sandboxes / packages'],
+      [C.accent, 'Platform & Clients'],
+      [C.warn,   'Governance controls'],
+      [C.danger, 'Safety & network filter'],
+      [C.green,  'GitHub & Audit trail'],
+      [C.muted,  'Isolated workspaces'],
     ];
     var lx = 30, ly = H - 10;
     legend.forEach(function (item, i) {
